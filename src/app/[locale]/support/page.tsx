@@ -71,6 +71,7 @@ export default async function SupportPage({
         </section>
 
         <div className="mt-10 flex flex-wrap gap-3 border-t border-border pt-6 text-sm">
+          <Link href="/docs" className="btn-primary">{t('docsLink')}</Link>
           <Link href="/about" className="btn-ghost">{t('aboutLink')}</Link>
           <Link href="/overview" className="btn-ghost">{t('overviewLink')}</Link>
           <Link href="/" className="btn-ghost">{t('homeLink')}</Link>

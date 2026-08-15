@@ -101,6 +101,7 @@ export default async function LandingPage({
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-6 text-sm text-muted-foreground">
           <div>{tApp('name')} · {new Date().getFullYear()}</div>
           <div className="flex flex-wrap gap-4">
+            <Link href="/docs" className="hover:text-foreground">{t('footerDocs')}</Link>
             <Link href="/about" className="hover:text-foreground">{t('footerAbout')}</Link>
             <Link href="/overview" className="hover:text-foreground">{t('footerOverview')}</Link>
             <Link href="/support" className="hover:text-foreground">{t('footerSupport')}</Link>

@@ -20,7 +20,8 @@
     "framingNoticeBody": "The Companion helps a trained counselor prepare their approach. It does not label, diagnose, or replace clinical judgment.",
     "footerAbout": "About",
     "footerOverview": "How it works",
-    "footerSupport": "Support"
+    "footerSupport": "Support",
+    "footerDocs": "User guide"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -523,6 +524,7 @@
       "q": "Which browsers work with the wearable?",
       "a": "Web Bluetooth pairing requires Chrome or Edge on desktop, or Chrome on Android. Safari and iOS do not support Web Bluetooth — use the Simulate mode for testing on those platforms."
     },
+    "docsLink": "Read the full guide",
     "aboutLink": "About",
     "overviewLink": "How it works",
     "homeLink": "Home"
@@ -553,6 +555,342 @@
       "stable": "Stable",
       "rising": "Rising",
       "updated": "Updated"
+    }
+  },
+  "docs": {
+    "kicker": "Documentation",
+    "title": "How to use the platform",
+    "lede": "A step-by-step walkthrough of every feature, every button, and every screen — from your first sign-in to a completed group session and a parent-shared report.",
+    "tocLabel": "Contents",
+    "framingLabel": "Reminder",
+    "framingBody": "Rawafid is decision-support for a trained counselor. It never diagnoses, labels, or replaces professional judgment. Everything the AI produces is a suggestion — you decide.",
+    "footer": "{app} · Documentation",
+    "supportLink": "Support",
+    "aboutLink": "About",
+    "homeLink": "Home",
+    "sections": {
+      "intro": {
+        "title": "Introduction",
+        "intro": "Rawafid is a companion platform for school counselors. During a 1:1 or group session, it gathers subtle signals (biometric readings from a wristband, tone of voice from the microphone) and turns them into gentle observations and suggested conversational moves — visible only to the counselor.\n\nOutside of sessions, it maintains a longitudinal picture of each student: growth over time, suggested interventions, and a private report that can be shared with a parent.\n\nThe platform is bilingual (Arabic + English) and works entirely in the browser. There is no app to install — just sign in and start."
+      },
+      "gettingStarted": {
+        "title": "Getting Started",
+        "intro": "First-time setup takes about two minutes. You'll sign in, pick or create your school, and land on the counselor dashboard.",
+        "sub1": {
+          "heading": "1. Sign in",
+          "body": "Open the platform URL and click 'Sign in' (top right). Sign in with your work email — an account is created automatically the first time you sign in. No manual approval is needed for counselors."
+        },
+        "sub2": {
+          "heading": "2. Choose your school",
+          "body": "If your school is already in the system, pick it from the dropdown on the left card and click 'Join school'. If not, use the right card: enter your school's name and city, then click 'Create school'. You'll become the first counselor on it."
+        },
+        "sub3": {
+          "heading": "3. Set a school icon",
+          "body": "During onboarding you can pick an emoji or upload a small logo image. This icon appears next to the school name in the sidebar — a subtle way to know which school you're working in when you have multiple browser tabs open."
+        },
+        "sub4": {
+          "heading": "4. Land on the dashboard",
+          "body": "After onboarding, the dashboard shows a snapshot: active sessions, students awaiting consent, and a decision-support reminder. From here, use the sidebar to navigate."
+        },
+        "tipHeading": "Foundation admins",
+        "tipBody": "If your email address is registered as a foundation admin, you're automatically routed to the /admin section instead of a school. Foundation admins manage multiple schools and can view aggregate audit logs."
+      },
+      "sidebar": {
+        "title": "The Sidebar",
+        "intro": "The left sidebar is your main navigation. On mobile, tap the menu icon in the top-left to open it. Each item is scoped to your school — you only ever see data for the students in your school.",
+        "sub1": {
+          "heading": "Dashboard",
+          "body": "Your home screen. Shows welcome message, active session count, pending consent count, and a decision-support framing note."
+        },
+        "sub2": {
+          "heading": "Students",
+          "body": "The full roster of students in your school. From here you can add a new student, open any student's profile, view their trends, manage consent, and start sessions."
+        },
+        "sub3": {
+          "heading": "Sessions",
+          "body": "All 1:1 sessions (past and active) in your school. Click 'Group sessions' at the top of this page to switch to the group session list. Both list views show status, duration, and let you delete completed sessions."
+        },
+        "sub4": {
+          "heading": "Reports",
+          "body": "Printable per-student and per-session reports. Useful before a parent meeting or when archiving a case."
+        },
+        "sub5": {
+          "heading": "Admin (foundation only)",
+          "body": "Foundation admins see this item. It gives access to school management, and the audit log showing who did what across all schools."
+        },
+        "sub6": {
+          "heading": "Top bar: language & sign-out",
+          "body": "Top right shows the language switcher (العربية / English) and your profile menu with sign-out. The current school name and icon are also shown there."
+        }
+      },
+      "students": {
+        "title": "Managing Students",
+        "intro": "The students section is where you add and view student profiles. Every student needs a profile before sessions can be run for them.",
+        "sub1": {
+          "heading": "Adding a new student",
+          "body": "Students page → click '+ Add student' (top right). Required fields: Student ID (your school's own ID) and Full name. Optional fields include grade, age, sex, phone, parent phone, parent email, avatar image, and notes. Click 'Save' — you land on the new student's profile."
+        },
+        "sub2": {
+          "heading": "Profile fields explained",
+          "body": "• Student ID — a code unique within your school (e.g. STU-042). This lets counselors cross-reference with school records.\n• Parent phone — for quick contact, distinct from the guardian contact on the consent record.\n• Parent email — required if you want to email parent-share links directly.\n• Avatar — the counselor's visual anchor. Upload a small image; it's stored inline."
+        },
+        "sub3": {
+          "heading": "Viewing a profile",
+          "body": "Click any student in the list. You'll see their profile with three action buttons at the top: 'View trends' (longitudinal charts), 'Manage consent' (opens consent form), and 'Start session' (disabled until consent is granted). Below are profile details, consent status, suggested interventions, parent access, and session history."
+        },
+        "sub4": {
+          "heading": "Deleting a student",
+          "body": "Scroll to the 'Danger zone' section at the bottom of the profile → click 'Delete student'. You'll be asked to confirm. This is a soft delete — the student is hidden from all lists, but sessions and audit trail remain for compliance."
+        },
+        "sub5": {
+          "heading": "The floating chat button",
+          "body": "On every student profile, a round chat button appears at the bottom-right of the screen. Tap it to ask the AI questions about this specific student — e.g. 'How has she progressed?' or 'What themes recur?' The answer is grounded in her actual sessions."
+        }
+      },
+      "consent": {
+        "title": "Consent",
+        "intro": "Consent is not just a policy — it's enforced by the platform. Sessions cannot start until a granted consent record is on file for the student.",
+        "sub1": {
+          "heading": "Why it's required",
+          "body": "Sessions capture biometric readings and audio. Both are sensitive. Recording explicit parental (and where applicable, student) consent protects the student, the counselor, and the school."
+        },
+        "sub2": {
+          "heading": "Recording consent",
+          "body": "From the student profile, click 'Manage consent'. Fill in: guardian name, relationship (e.g. Father, Mother), contact (phone or email), status (Granted / Pending / Revoked / Expired), and optional notes. Click 'Save'. The status colour appears on the profile as a badge."
+        },
+        "sub3": {
+          "heading": "The four statuses",
+          "body": "• Pending — no active consent, sessions blocked.\n• Granted — sessions allowed. Signed date is recorded automatically.\n• Revoked — consent withdrawn. Sessions blocked. Revoked date is recorded.\n• Expired — automatic when an expiry date passes."
+        },
+        "sub4": {
+          "heading": "The gate in practice",
+          "body": "On any student without granted consent, the 'Start session' button on their profile is disabled and shows a hint on hover. The consent card also shows a yellow warning. Grant consent, refresh, and the button activates."
+        },
+        "tipHeading": "Group sessions",
+        "tipBody": "Group sessions currently pull only students with granted consent into the eligible-picker. Ad-hoc participants you add by name inside the group form bypass that check, since they're a lightweight roster addition without biometric capture."
+      },
+      "sessions": {
+        "title": "Individual Sessions (1:1)",
+        "intro": "A 1:1 session pairs a counselor with a single student. During the session, biometric readings from the wearable and voice level from the browser mic feed into the AI, which returns brief observations and suggested conversational moves — all visible only on the counselor's screen.",
+        "sub1": {
+          "heading": "Starting a session",
+          "body": "From the student profile, click 'Start session' (top right). You're taken to the live session view. The student is not shown anything — this is the counselor's dashboard."
+        },
+        "sub2": {
+          "heading": "Pairing the wearable",
+          "body": "Click 'Pair wearable' — the browser opens a Bluetooth chooser showing nearby ESP32 wristbands. Pick yours and confirm. A connection dot turns green. Readings start flowing every few seconds. If you don't have hardware yet, click 'Simulate' — the platform generates fake readings so you can exercise the whole flow."
+        },
+        "sub3": {
+          "heading": "Live vitals",
+          "body": "Four tiles at the top show the latest reading: Heart rate (bpm), SpO₂ (%), Nervousness (0-100% derived from skin conductance), Skin temperature (°C). Below them, sparklines show the last minute of heart rate and nervousness."
+        },
+        "sub4": {
+          "heading": "Voice capture",
+          "body": "Click 'Enable mic' — the browser asks permission. Once granted, the mic captures audio in 20-second chunks and sends them to Whisper for transcription. A pulsing ring visualises voice level (silent / soft / speaking / elevated) so the counselor can glance at engagement without reading transcript lines."
+        },
+        "sub5": {
+          "heading": "Live AI observations",
+          "body": "Roughly every 15 seconds during the session, the platform bundles the recent biometric window plus any transcript segments and asks Claude for a brief observation. The result appears in the AI card as a short summary plus 1-3 suggested conversational moves. These are suggestions only — the counselor decides what to do with them."
+        },
+        "sub6": {
+          "heading": "Ending the session",
+          "body": "When you're done, click 'End session' at the bottom of the live view. You're taken to the session summary page. The wearable is disconnected automatically."
+        },
+        "sub7": {
+          "heading": "Session summary",
+          "body": "After a session ends, Claude produces a whole-session summary + a suggestion for the next meeting. This usually appears within 15 seconds. If you need it regenerated (e.g. after adding notes), click 'Regenerate' on the summary card."
+        }
+      },
+      "groups": {
+        "title": "Group Sessions",
+        "intro": "A group session is a facilitated discussion with two or more students. Unlike 1:1 sessions, there's no wearable — just the browser mic capturing the room. The AI observes group dynamics, not per-student states.",
+        "sub1": {
+          "heading": "Creating a group session",
+          "body": "Sessions page → click 'Group sessions' → click 'New group session'. Fill in a title (e.g. 'Exam stress workshop'), an optional topic, then pick two or more participants from the eligible list (only students with granted consent appear here). Click 'Start session'."
+        },
+        "sub2": {
+          "heading": "Adding ad-hoc participants",
+          "body": "Below the checkbox list is 'Add students not in the list' — click 'Add another' and type a name. This creates a lightweight student record on the fly and adds them to the roster. Useful for one-off attendees who aren't formally registered yet."
+        },
+        "sub3": {
+          "heading": "Live listening",
+          "body": "Once the session is active, the live panel appears. Click 'Enable mic' to start capturing. The mic ring pulses with voice level, transcript snippets appear as they're processed, and every ~20 seconds the AI observation card updates with the current group dynamic + suggested facilitation moves."
+        },
+        "sub4": {
+          "heading": "Ending the group session",
+          "body": "When done, fill in the 'Facilitator notes' text area with anything worth remembering (surprising moments, themes, participants who stood out), then click 'End session'. The notes are appended to the transcript when building the summary."
+        },
+        "sub5": {
+          "heading": "Group summary",
+          "body": "After ending, Claude produces a whole-group summary + a suggestion for the next meeting. This considers the transcript, your notes, and the per-window observations gathered during the session. Click 'Regenerate' if you want a fresh take."
+        },
+        "sub6": {
+          "heading": "Ask the group chatbot",
+          "body": "The floating chat button on the group session page is scoped to that specific group — ask 'Who seemed less engaged?' or 'What could the next meeting focus on?' and the answer is grounded in the actual transcript and observations."
+        }
+      },
+      "ai": {
+        "title": "AI Features Overview",
+        "intro": "Rawafid uses Claude (from Anthropic) for reasoning and Whisper (from OpenAI) for speech-to-text. All AI outputs are decision-support — never a clinical assessment.",
+        "sub1": {
+          "heading": "Live per-window analysis",
+          "body": "During an active session, roughly every 15-20 seconds, Claude receives a bundle: the recent biometric window (HR, GSR, skin temp, voice level) and any transcript segments. It returns a 1-2 sentence state read plus 1-3 practical conversational moves."
+        },
+        "sub2": {
+          "heading": "Whole-session summary",
+          "body": "When a session ends, Claude reviews the full transcript + biometric arc + per-window observations, and produces a cohesive summary + a suggestion for the next session. Stored on the session record and cached for 6 hours."
+        },
+        "sub3": {
+          "heading": "Longitudinal growth summary",
+          "body": "Once a student has 2+ completed sessions, a growth summary is generated on the student profile. It describes patterns across sessions — not a single moment — and refreshes every 24 hours or when you explicitly regenerate."
+        },
+        "sub4": {
+          "heading": "Auto-translation of AI content",
+          "body": "AI outputs are saved in the counselor's active locale at the time of generation. If you switch language later, the platform translates on-the-fly (cached) so the same summary appears in whichever language you're viewing."
+        }
+      },
+      "chat": {
+        "title": "The Report Chatbot",
+        "intro": "A floating chat button appears at the bottom-right of every session, student, and group detail/report page. It's an AI companion scoped to that specific record — ask questions in plain language and get grounded answers.",
+        "sub1": {
+          "heading": "Where you'll find it",
+          "body": "On six pages: session detail, session report, student profile, student report, student trends, and group session detail. On Arabic pages the button flips to the bottom-left to respect RTL."
+        },
+        "sub2": {
+          "heading": "What it can answer",
+          "body": "The chatbot only knows about the current record. Examples:\n• Session chat: 'What patterns showed up?', 'How should I open the next session?'\n• Student chat: 'How has she progressed?', 'What themes recur across her sessions?'\n• Group chat: 'Who was less engaged?', 'What could the next meeting focus on?'"
+        },
+        "sub3": {
+          "heading": "Privacy",
+          "body": "Conversations are ephemeral — nothing is stored on the server or in the DB. Each question rebuilds context from the record on the server. Only an audit log entry is written (recording that a chat happened, not the content)."
+        }
+      },
+      "interventions": {
+        "title": "Interventions Library",
+        "intro": "A curated set of 10 bilingual issue → suggested-action mappings that appear on every student profile. Reference material for counselors when a pattern surfaces in a session.",
+        "sub1": {
+          "heading": "The 10 areas covered",
+          "body": "Low self-confidence, social isolation, weak communication, weak sense of responsibility, low motivation, anxiety / stress, weak academic skills, trouble forming relationships, talent discovery, and weak school belonging. Each pairs the issue with a concrete cultural-fit action (e.g. 'join a school radio segment')."
+        },
+        "sub2": {
+          "heading": "Where they appear",
+          "body": "On the student profile page, between the consent card and the parent-access card. They're always visible as a reference — the counselor picks the one that fits when a session surfaces a matching pattern."
+        }
+      },
+      "parents": {
+        "title": "Parent Access",
+        "intro": "You can generate a private link that lets a parent view a sanitized progress page for their child — growth summary, per-session summaries, and qualitative trends. No biometrics, no transcript.",
+        "sub1": {
+          "heading": "Creating a share link",
+          "body": "On the student profile, scroll to the 'Parent access' card. Optionally set an expiry in days (leave blank for no expiry), then click 'Generate link'. A random 32-byte token is minted — the resulting URL only works with that token."
+        },
+        "sub2": {
+          "heading": "Copying or sending by email",
+          "body": "Each active link has two buttons:\n• 'Copy link' — copies to clipboard.\n• 'Send by email' — opens the mail app pre-filled to the parent's email address (only appears if the student has a parent email on file), with a suggested subject and body."
+        },
+        "sub3": {
+          "heading": "What parents see",
+          "body": "The parent page shows: a stats bar (session count, total time, latest date), the growth summary, three trend tiles (Calmness, Composure, Engagement) with qualitative direction (Improving / Stable / Worth attention / Not enough data), and a chronological session history with per-session summaries and next-session suggestions."
+        },
+        "sub4": {
+          "heading": "Language switcher on the parent view",
+          "body": "The parent can toggle between العربية and English via two pill buttons at the top-right (top-left in Arabic). All UI labels and AI-generated content switch language — the platform translates stored summaries on the fly and caches the result."
+        },
+        "sub5": {
+          "heading": "Revoking a link",
+          "body": "Click 'Revoke' on any active link → confirm. The parent loses access immediately (their page shows a 'link revoked' message). Revoke is preferred over deletion — the audit trail keeps the record. Generate a new link if the parent still needs access."
+        },
+        "tipHeading": "The view counter",
+        "tipBody": "Each active link shows how many times it has been viewed and when. Useful for confirming the parent actually opened the page before your next call."
+      },
+      "reports": {
+        "title": "Reports",
+        "intro": "Two kinds of printable reports — per-session and per-student — plus a longitudinal trends page. All are counselor-only views; parent-facing reports go through the Parent Access flow instead.",
+        "sub1": {
+          "heading": "Session report",
+          "body": "From any session detail page (or Reports → open report), you get a full session write-up: metadata (counselor, device, duration), biometric charts, AI observation timeline, and the full transcript. Click 'Print' (top right) to save as PDF."
+        },
+        "sub2": {
+          "heading": "Student report",
+          "body": "From Reports → per-student summaries, or Students → open student → Reports link. Shows profile, consent status, growth summary, per-session average charts, and a table of all completed sessions."
+        },
+        "sub3": {
+          "heading": "Trends page",
+          "body": "Students → open student → 'View trends'. A dashboard of longitudinal charts (heart rate, nervousness per session) plus session-count and total-time counters. Useful for spotting drift over weeks or months."
+        },
+        "sub4": {
+          "heading": "Printing",
+          "body": "Both report pages have a 'Print' button that triggers the browser's print dialog with a print-optimized layout. Save as PDF from there. The chatbot button is automatically hidden in the printed version."
+        }
+      },
+      "admin": {
+        "title": "Admin",
+        "intro": "Foundation admins have access to cross-school management. Counselors won't see this section — it's routed automatically based on your role.",
+        "sub1": {
+          "heading": "Foundation overview",
+          "body": "The /admin page lists all schools registered under your foundation. Click any school to see its detail: counselors, student count, session count. This is a read-only overview — day-to-day work still happens inside the school by counselors."
+        },
+        "sub2": {
+          "heading": "Editing a school",
+          "body": "On the school detail page, you can edit the school's name, city, and icon. Changes are audited."
+        },
+        "sub3": {
+          "heading": "Audit log",
+          "body": "/admin/audit shows every meaningful action across all schools — who viewed what, who created / edited / deleted, who exported a report. Filter by school or date. This is the accountability backbone of the platform."
+        }
+      },
+      "lang": {
+        "title": "Language & Direction",
+        "intro": "The platform is fully bilingual. Every screen — including AI-generated content — is available in both Arabic and English.",
+        "sub1": {
+          "heading": "Switching language",
+          "body": "Top-right corner shows a language toggle (العربية / English). Click to switch — the URL changes from /en/... to /ar/... (or vice versa) and the whole UI updates. Your preference is remembered for the next visit via a cookie."
+        },
+        "sub2": {
+          "heading": "RTL handling",
+          "body": "Arabic mode flips the layout: sidebar moves to the right, text flows right-to-left, and floating elements (like the chatbot button) mirror. AI outputs that were saved in one language are translated on-the-fly when viewed in the other."
+        }
+      },
+      "privacy": {
+        "title": "Privacy & Data",
+        "intro": "Every data operation is scoped to your school. You cannot see data from other schools, and other counselors cannot see your students. Foundation admins see aggregates and audit trails, not raw content.",
+        "sub1": {
+          "heading": "Multi-tenant isolation",
+          "body": "Every table row is tagged with a school ID and every query filters by it automatically. This is enforced at the database-access layer, not just in UI code — a bug in one page can't accidentally leak another school's data."
+        },
+        "sub2": {
+          "heading": "What's stored",
+          "body": "Biometric samples, transcript segments, and AI outputs are stored in a private Postgres database. Voice audio is streamed to Whisper for transcription and not retained. Nothing is shared with third parties beyond the necessary AI providers (Anthropic for reasoning, OpenAI for speech-to-text)."
+        },
+        "sub3": {
+          "heading": "What parents see",
+          "body": "The parent share link is deliberately narrow: growth summary, per-session narrative summaries, and qualitative trends. It never shows raw biometrics, transcripts, or per-window AI observations. Those stay between the counselor and the student's file."
+        }
+      },
+      "troubleshooting": {
+        "title": "Troubleshooting",
+        "intro": "Common issues and their fixes. If none apply, use the Support link at the bottom.",
+        "sub1": {
+          "heading": "The page loads slowly on the first visit",
+          "body": "The database compute suspends after ~5 minutes of inactivity to save resources. The first request wakes it, which takes 3-8 seconds. Subsequent requests are fast. This is normal for the free hosting tier."
+        },
+        "sub2": {
+          "heading": "'Bluetooth not supported' when pairing",
+          "body": "Web Bluetooth only works in Chrome, Edge, and Opera on desktop, or Chrome on Android. Safari (macOS + iOS) and Firefox don't support it. If you're on an unsupported browser, use 'Simulate' to exercise the flow."
+        },
+        "sub3": {
+          "heading": "Mic permission denied",
+          "body": "The browser blocks the microphone by default. When you first click 'Enable mic', the browser asks for permission — click 'Allow'. If you accidentally clicked 'Block', click the padlock icon in the address bar and reset the mic permission for the site."
+        },
+        "sub4": {
+          "heading": "Sign-in redirects don't work",
+          "body": "If sign-in loops or shows a 'domain not allowed' error, the deployed URL isn't yet registered with the auth provider. Contact the platform admin — the fix is a one-time domain addition in the auth dashboard."
+        },
+        "sub5": {
+          "heading": "'Language does not match content'",
+          "body": "When you switch language on the parent view, translation of AI content happens on the first view in that language and can take 2-4 seconds. The result is cached, so subsequent views in the same language are instant."
+        }
+      }
     }
   }
 }
