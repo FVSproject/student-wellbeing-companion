@@ -26,6 +26,8 @@ import { BrandMark } from '@/components/brand-mark';
  * Structure: a table of contents on the side (sticky on desktop), with
  * anchored sections rendered from the docs.* translation namespace.
  */
+
+export const dynamic = 'force-dynamic';
 export default async function DocsPage({
   params,
 }: {
