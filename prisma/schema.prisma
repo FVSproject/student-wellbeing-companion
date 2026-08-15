@@ -1,0 +1,456 @@
+// Student Wellbeing Companion — data model
+// See PLATFORM_ARCHITECTURE.md §4 for the source-of-truth diagram.
+//
+// Multi-tenancy invariant: every row on a tenant-scoped model carries
+// `schoolId`. All queries touching tenant data MUST filter/inject
+// `schoolId` — enforced at the tenant-db layer in src/lib/tenant.ts.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ---------- enums ----------
+
+enum UserRole {
+  COUNSELOR
+  SCHOOL_ADMIN
+  FOUNDATION_ADMIN
+}
+
+enum ConsentStatus {
+  PENDING
+  GRANTED
+  REVOKED
+  EXPIRED
+}
+
+enum SessionStatus {
+  SCHEDULED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum Speaker {
+  STUDENT
+  COUNSELOR
+  UNKNOWN
+}
+
+enum DeviceStatus {
+  UNPAIRED
+  PAIRED
+  RETIRED
+}
+
+enum StudentSex {
+  FEMALE
+  MALE
+  UNSPECIFIED
+}
+
+// ---------- top of tenancy tree ----------
+
+model Foundation {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  schools School[]
+  admins  User[]   @relation("FoundationAdmins")
+
+  @@map("foundations")
+}
+
+// A School is the tenant boundary. All PII/session data is scoped by schoolId.
+model School {
+  id           String    @id @default(cuid())
+  foundationId String
+  name         String
+  // Clerk Organization ID — links the auth-side org to our tenant row.
+  clerkOrgId   String?   @unique
+  city         String?
+  // Single emoji chosen at onboarding to distinguish this school visually.
+  // Mutually exclusive with logoUrl at write time — the picker clears one
+  // when the other is chosen — but both columns exist so display code can
+  // choose whichever is set (logoUrl wins if both).
+  iconEmoji    String?
+  logoUrl      String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  foundation Foundation @relation(fields: [foundationId], references: [id], onDelete: Restrict)
+
+  users          User[]
+  students       Student[]
+  devices        Device[]
+  sessions       Session[]
+  consentRecords ConsentRecord[]
+  sessionSamples SessionSample[]
+  transcriptSegs TranscriptSegment[]
+  aiAnalyses     AIAnalysis[]
+
+  @@index([foundationId])
+  @@map("schools")
+}
+
+// ---------- users ----------
+
+model User {
+  id          String   @id @default(cuid())
+  // Clerk user ID (e.g. "user_2abcXYZ") — the auth-side identity.
+  clerkUserId String   @unique
+  email       String   @unique
+  fullName    String
+  role        UserRole
+
+  // Counselors and school admins are scoped to a school.
+  // Foundation admins have foundationId set and schoolId null.
+  schoolId     String?
+  foundationId String?
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastActiveAt DateTime?
+
+  school     School?     @relation(fields: [schoolId], references: [id], onDelete: SetNull)
+  foundation Foundation? @relation("FoundationAdmins", fields: [foundationId], references: [id], onDelete: SetNull)
+
+  counseledSessions      Session[]       @relation("CounselorSessions")
+  counseledGroupSessions GroupSession[]  @relation("CounselorGroupSessions")
+  auditEntries           AuditLogEntry[]
+
+  @@index([schoolId])
+  @@index([foundationId])
+  @@map("users")
+}
+
+// ---------- students ----------
+
+model Student {
+  id          String      @id @default(cuid())
+  schoolId    String
+  // School's own student ID (رقم الطالبة). Unique within the school only.
+  externalId  String
+  fullName    String
+  gradeLevel  String?
+  age         Int?
+  sex         StudentSex?
+  phone       String?
+  // Fast-access parent phone; distinct from ConsentRecord.guardianContact
+  // (which is the formal record captured at consent signing).
+  parentPhone String?
+  // Parent email — used to send the parent-access magic link.
+  parentEmail String?
+  // URL to a profile image. External hosting for now — R2 upload TBD.
+  avatarUrl   String?
+  notes       String?     @db.Text
+
+  // Longitudinal Claude summary across all completed sessions + computed
+  // improvement metrics. Regenerated on view when older than the TTL below.
+  growthSummary     String?   @db.Text
+  growthMetrics     Json?
+  growthGeneratedAt DateTime?
+  growthLocale      String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  school        School                @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  consent       ConsentRecord?
+  sessions      Session[]
+  parentShares  ParentShareLink[]
+  groupSessions GroupSessionStudent[]
+
+  @@unique([schoolId, externalId])
+  @@index([schoolId, deletedAt])
+  @@map("students")
+}
+
+// Group counseling session — 2+ students in one facilitated discussion.
+// Distinct from 1:1 Session: no wearable ingestion, no per-student transcript.
+// The counselor captures a shared summary + suggestion after the meeting.
+model GroupSession {
+  id          String        @id @default(cuid())
+  schoolId    String
+  counselorId String
+  title       String
+  topic       String?       @db.Text
+  status      SessionStatus @default(SCHEDULED)
+  startedAt   DateTime?
+  endedAt     DateTime?
+  notes       String?       @db.Text
+
+  // Facilitator-captured or Claude-generated summary of the group discussion.
+  overallSummary     String?   @db.Text
+  overallSuggestion  String?   @db.Text
+  summaryGeneratedAt DateTime?
+  summaryModel       String?
+  summaryLocale      String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  counselor   User                  @relation("CounselorGroupSessions", fields: [counselorId], references: [id], onDelete: Restrict)
+  members     GroupSessionStudent[]
+  transcripts TranscriptSegment[]
+  analyses    AIAnalysis[]
+
+  @@index([schoolId, status])
+  @@index([schoolId, deletedAt])
+  @@map("group_sessions")
+}
+
+model GroupSessionStudent {
+  groupSessionId String
+  studentId      String
+  addedAt        DateTime @default(now())
+
+  groupSession GroupSession @relation(fields: [groupSessionId], references: [id], onDelete: Cascade)
+  student      Student      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@id([groupSessionId, studentId])
+  @@index([studentId])
+  @@map("group_session_students")
+}
+
+// Public-token magic link that lets a parent view a sanitized progress page
+// for their child (growth summary + session dates only; no biometrics,
+// no transcript). Rotate liberally — revoking sets revokedAt.
+model ParentShareLink {
+  id              String    @id @default(cuid())
+  token           String    @unique
+  studentId       String
+  schoolId        String
+  createdByUserId String?
+  createdAt       DateTime  @default(now())
+  expiresAt       DateTime?
+  revokedAt       DateTime?
+  lastViewedAt    DateTime?
+  viewCount       Int       @default(0)
+
+  // Per-locale cache of AI-content translations for the public parent page.
+  // Shape: { en?: { hash, growthSummary, sessions: {id: {summary, suggestion}} },
+  //          ar?: { ... } }
+  // The `hash` lets us invalidate when underlying content changes.
+  translations Json?
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId, revokedAt])
+  @@map("parent_share_links")
+}
+
+// Parental + student consent to biometric + audio collection.
+// One current record per student; history handled via AuditLogEntry.
+model ConsentRecord {
+  id               String        @id @default(cuid())
+  studentId        String        @unique
+  schoolId         String
+  status           ConsentStatus @default(PENDING)
+  guardianName     String
+  guardianRelation String
+  guardianContact  String
+  signedAt         DateTime?
+  expiresAt        DateTime?
+  revokedAt        DateTime?
+  documentUrl      String?
+  notes            String?       @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  student Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  school  School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([schoolId, status])
+  @@map("consent_records")
+}
+
+// ---------- devices ----------
+
+model Device {
+  id           String       @id @default(cuid())
+  schoolId     String
+  name         String
+  // BLE MAC address or user-assigned serial (e.g. printed on wristband).
+  serialNumber String       @unique
+  status       DeviceStatus @default(UNPAIRED)
+  lastSeenAt   DateTime?
+  batteryPct   Int?
+  firmwareRev  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  school   School    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  sessions Session[]
+
+  @@index([schoolId, status])
+  @@map("devices")
+}
+
+// ---------- sessions ----------
+
+model Session {
+  id          String        @id @default(cuid())
+  schoolId    String
+  studentId   String
+  counselorId String
+  deviceId    String?
+  status      SessionStatus @default(SCHEDULED)
+
+  // Per-session HMAC secret used by the browser to sign ingestion writes.
+  // Rotated at session start; invalidated on session end.
+  ingestToken String @unique @default(cuid())
+
+  startedAt DateTime?
+  endedAt   DateTime?
+  notes     String?   @db.Text // Counselor's private post-session notes.
+
+  // AI-generated summary of the whole session — the arc of the conversation,
+  // notable state shifts, and what to consider for the next session with this
+  // student. Generated by generateSessionSummary() on session end.
+  overallSummary     String?   @db.Text
+  overallSuggestion  String?   @db.Text
+  summaryGeneratedAt DateTime?
+  summaryModel       String?
+  summaryLocale      String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  school    School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  counselor User    @relation("CounselorSessions", fields: [counselorId], references: [id], onDelete: Restrict)
+  device    Device? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+
+  samples     SessionSample[]
+  transcripts TranscriptSegment[]
+  analyses    AIAnalysis[]
+
+  @@index([schoolId, status])
+  @@index([studentId, startedAt])
+  @@index([counselorId, startedAt])
+  @@map("sessions")
+}
+
+// ---------- time-series: samples, transcripts, analyses ----------
+
+// One row per biometric bundle written by the browser (default ~every 5s).
+// schoolId is denormalized so tenant-scoped reads never need a join.
+model SessionSample {
+  id        BigInt   @id @default(autoincrement())
+  sessionId String
+  schoolId  String
+  timestamp DateTime
+
+  heartRate   Int? // bpm
+  hrv         Float? // ms, RMSSD
+  spo2        Float? // %
+  gsr         Float? // microsiemens
+  skinTemp    Float? // celsius
+  motionScore Float? // 0..1, rolling accel variance
+  // Instantaneous RMS voice level captured from the counselor's browser mic
+  // at the moment this sample was posted. 0 = silent, ~0.3+ = elevated speech.
+  voiceLevel  Float?
+  batteryPct  Int?
+
+  session Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  school  School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, timestamp])
+  @@index([schoolId, timestamp])
+  @@map("session_samples")
+}
+
+model TranscriptSegment {
+  id             BigInt   @id @default(autoincrement())
+  // Exactly one of sessionId / groupSessionId is set — enforced at the app
+  // layer since composite XOR constraints aren't natively expressible.
+  sessionId      String?
+  groupSessionId String?
+  schoolId       String
+  timestamp      DateTime // start of segment
+  durationMs     Int
+  text           String   @db.Text
+  speaker        Speaker  @default(UNKNOWN)
+  confidence     Float? // 0..1 from STT
+
+  session      Session?      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  groupSession GroupSession? @relation(fields: [groupSessionId], references: [id], onDelete: Cascade)
+  school       School        @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, timestamp])
+  @@index([groupSessionId, timestamp])
+  @@map("transcript_segments")
+}
+
+// Rolling Claude analysis: emotional state read + suggested counselor
+// approach for a given time window. Counselor-facing only.
+model AIAnalysis {
+  id             String   @id @default(cuid())
+  // Exactly one of sessionId / groupSessionId is set.
+  sessionId      String?
+  groupSessionId String?
+  schoolId       String
+  timestamp      DateTime @default(now())
+  windowStart    DateTime
+  windowEnd      DateTime
+
+  stateSummary        String @db.Text
+  suggestedApproaches Json // string[] — 1..3 items
+
+  // Locale the analysis was generated in. Used by the translate endpoint to
+  // decide whether to Claude-translate on-view when the viewer's locale
+  // differs. Nullable for records created before this column existed.
+  locale String?
+
+  model        String // e.g. "claude-opus-4-7"
+  inputTokens  Int?
+  outputTokens Int?
+
+  session      Session?      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  groupSession GroupSession? @relation(fields: [groupSessionId], references: [id], onDelete: Cascade)
+  school       School        @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, timestamp])
+  @@index([groupSessionId, timestamp])
+  @@map("ai_analyses")
+}
+
+// ---------- audit log (cross-cutting, append-only) ----------
+
+// Every read/write of sensitive data leaves a trail. Never mutate rows.
+model AuditLogEntry {
+  id               String  @id @default(cuid())
+  actorUserId      String?
+  actorClerkUserId String?
+  schoolId         String? // null for cross-tenant / system actions
+  action           String // e.g. "student.view", "session.samples.list"
+  targetType       String // e.g. "student", "session", "aiAnalysis"
+  targetId         String?
+  metadata         Json?
+  ipAddress        String?
+  userAgent        String?
+
+  createdAt DateTime @default(now())
+
+  actor User? @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([schoolId, createdAt])
+  @@index([targetType, targetId])
+  @@index([actorUserId, createdAt])
+  @@map("audit_log_entries")
+}

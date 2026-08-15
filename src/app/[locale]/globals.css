@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Rawafid palette — derived from Future Vision Private Schools identity.
+       Deep navy blue primary + orange accent, warm cream neutrals. */
+    --background: 251 250 247;
+    --foreground: 30 27 25;
+    --muted: 244 242 236;
+    --muted-foreground: 115 108 100;
+    --border: 228 224 216;
+    --primary: 30 58 138;              /* deep FVS navy blue */
+    --primary-foreground: 240 249 255;
+    --accent: 235 240 251;             /* soft blue tint */
+    --brand-orange: 249 115 22;        /* FVS orange, for highlights */
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  html[dir='rtl'] body {
+    font-family: 'Cairo', 'Tajawal', 'Segoe UI', system-ui, sans-serif;
+  }
+
+  html[dir='ltr'] body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition hover:opacity-90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted active:scale-[0.98];
+  }
+
+  .card {
+    @apply rounded-xl border border-border bg-white p-6 shadow-sm;
+  }
+}
+
+@media print {
+  /* Strip app chrome for clean printed reports. */
+  header, aside, .no-print {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .card {
+    box-shadow: none !important;
+    border: 1px solid #e5e5e5 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .animate-fade-in-up {
+    animation: none !important;
+  }
+}
+
+@layer utilities {
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-in-up {
+    animation: fade-in-up 240ms ease-out both;
+  }
+}
