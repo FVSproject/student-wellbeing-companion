@@ -1,13 +1,13 @@
 # Student Wellbeing Companion — Project Brief
 
 **Owner:** م. يوسف علي عطوة — Head of Electronics & Programming, Fab Lab Al-Ahsa
-**Purpose:** Wearable device + platform to support a school student counselor (مرشدة طالبات) during counseling/therapeutic sessions. The device captures biometric signals and speech while a student talks, sends them to an AI API for real-time emotional/psychological state analysis, and returns guidance to the counselor (not the student) on how to approach the session.
+**Purpose:** Hand-rest sensor device + platform to support a school student counselor (مرشدة طالبات) during counseling/therapeutic sessions. The student rests their hand on a small hand-shaped sensor pad which captures biometric signals while they talk; the platform pairs speech and biometrics, sends them to an AI API for real-time emotional/psychological state analysis, and returns guidance to the counselor (not the student) on how to approach the session.
 
 ---
 
 ## 1. Concept summary
 
-- A student wears a small sensor device during a counseling session.
+- A student rests their hand on a small hand-shaped sensor pad during a counseling session.
 - The device streams biometric data + audio to a hub (phone/laptop/Raspberry Pi or directly to cloud via WiFi).
 - An AI API (speech-to-text + analysis) processes the transcript + biometric readings together.
 - The AI returns:
@@ -39,23 +39,22 @@ Full costed BOM: `Student_Wellbeing_Electronics_Cost_Analysis.xlsx` (already gen
 
 ### Still needed (mechanical, not yet costed)
 - On/off switch
-- Finger-clip or wristband housing (MAX30102 + GSR electrodes)
-- Small enclosure for ESP32 + battery
+- Hand-shaped sensor pad housing (contoured to the student's palm — MAX30102 under one fingertip, GSR pads under two other fingertips, MLX90614 aimed at the back of the resting hand)
+- Small enclosure for ESP32 + battery (integrated into the pad base)
 - Optional status LED (recording/connected indicator)
 
-### Suggested sensor placement
-- MAX30102 → one fingertip
-- GSR pads → two other fingers
-- MLX90614 → aimed at wrist/back of hand (non-contact, no placement conflict)
-- MPU-6050 → mounted on the wristband/enclosure itself
-- INMP441 → mounted in enclosure, facing outward toward the student
+### Suggested sensor placement (hand-rest form factor)
+- MAX30102 → under the index-finger tip position
+- GSR pads → under the middle and ring finger positions
+- MLX90614 → aimed at the back of the hand (non-contact)
+- No wristband strap needed — the student simply rests their palm on the pad for the duration of the session
 
 ---
 
 ## 3. System architecture
 
 ```
-[Wearable: ESP32 + sensors]
+[Hand-rest sensor: ESP32 + sensors in a hand-shaped pad]
         │  WiFi / BLE
         ▼
 [Hub: phone / laptop / Fab Lab server]

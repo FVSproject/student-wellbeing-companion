@@ -80,14 +80,14 @@ async function main() {
     });
   }
 
-  console.log('→ Seeding wearable device…');
+  console.log('→ Seeding hand-rest sensor…');
   const device = await db.device.upsert({
-    where: { serialNumber: 'WEARABLE-001' },
+    where: { serialNumber: 'HANDREST-001' },
     create: {
       id: DEVICE_ID,
       schoolId: school.id,
-      name: 'Wristband #1',
-      serialNumber: 'WEARABLE-001',
+      name: 'Hand-rest sensor #1',
+      serialNumber: 'HANDREST-001',
       status: DeviceStatus.PAIRED,
       firmwareRev: '0.1.0',
     },

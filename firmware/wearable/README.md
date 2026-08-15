@@ -1,7 +1,9 @@
-# Wearable firmware — Student Wellbeing Companion
+# Hand-rest sensor firmware — Student Wellbeing Companion
 
-Firmware for the ESP32 DevKitC-32 that reads the biometric sensors and streams
-them over BLE to the counselor's browser (Web Bluetooth).
+Firmware for the ESP32 DevKitC-32 inside the hand-shaped sensor pad. Reads the
+biometric sensors (MAX30102 under the fingertip, GSR under two other fingertips,
+MLX90614 above the back of the hand) and streams the packed sample bundle over
+BLE to the counselor's browser (Web Bluetooth).
 
 ## Wiring
 

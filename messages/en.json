@@ -450,7 +450,7 @@
     "purposeTitle": "Purpose",
     "purposeBody": "To help counselors better attune to their students during sessions by surfacing real-time biometric signals — heart rate, skin response, motion — alongside the conversation. Suggested approaches from an AI model help the counselor decide when to slow down, reflect back, or shift topic.",
     "howTitle": "How it works",
-    "howBody": "A student wears a small wristband with medical-grade sensors. The counselor's browser pairs with the device via Bluetooth. Every few seconds a bundle of readings and a transcript segment goes to a private server, and an AI returns a brief state summary and 1–3 suggested conversational moves — visible only on the counselor's screen.",
+    "howBody": "A student rests their hand on a small hand-shaped sensor pad with medical-grade sensors. The counselor's browser pairs with the device via Bluetooth. Every few seconds a bundle of readings and a transcript segment goes to a private server, and an AI returns a brief state summary and 1–3 suggested conversational moves — visible only on the counselor's screen.",
     "boundariesTitle": "What it is NOT",
     "boundariesBody": "This is not a diagnostic tool. It never labels a student with a condition, never suggests medication or clinical referral without human review, and never displays anything to the student. It's decision-support for a trained counselor — nothing more.",
     "framingNote": "🌱 روافد — we listen, we understand, we empower.",
@@ -471,12 +471,12 @@
       "body": "No session can begin until a Guardian's signed consent is on file. This is enforced by the platform, not just a policy."
     },
     "step3": {
-      "title": "Pair the wearable device",
-      "body": "At the start of a session, the counselor's Chrome/Edge browser pairs with the ESP32 wristband over Web Bluetooth. A Simulate button lets you exercise the flow without hardware."
+      "title": "Pair the hand-rest sensor",
+      "body": "At the start of a session, the counselor's Chrome/Edge browser pairs with the ESP32-based hand-shaped sensor pad over Web Bluetooth. A Simulate button lets you exercise the flow without hardware."
     },
     "step4": {
       "title": "Live signal ingestion",
-      "body": "Every ~3–5 seconds the wearable pushes a bundle of readings (HR, HRV, GSR, skin temp, motion) to the platform, which stores them and updates a live chart on the counselor's screen."
+      "body": "Every ~3–5 seconds the hand-rest sensor pushes a bundle of readings (HR, HRV, GSR, skin temp, motion) to the platform, which stores them and updates a live chart on the counselor's screen."
     },
     "step5": {
       "title": "Rolling AI guidance",
@@ -521,7 +521,7 @@
       "a": "The counselor can revoke consent from the student profile, which soft-deletes future access. For full erasure, contact the platform lead — a manual purge is honored per the Foundation's data-handling policy."
     },
     "faq4": {
-      "q": "Which browsers work with the wearable?",
+      "q": "Which browsers work with the hand-rest sensor?",
       "a": "Web Bluetooth pairing requires Chrome or Edge on desktop, or Chrome on Android. Safari and iOS do not support Web Bluetooth — use the Simulate mode for testing on those platforms."
     },
     "docsLink": "Read the full guide",
@@ -571,7 +571,7 @@
     "sections": {
       "intro": {
         "title": "Introduction",
-        "intro": "Rawafid is a companion platform for school counselors. During a 1:1 or group session, it gathers subtle signals (biometric readings from a wristband, tone of voice from the microphone) and turns them into gentle observations and suggested conversational moves — visible only to the counselor.\n\nOutside of sessions, it maintains a longitudinal picture of each student: growth over time, suggested interventions, and a private report that can be shared with a parent.\n\nThe platform is bilingual (Arabic + English) and works entirely in the browser. There is no app to install — just sign in and start."
+        "intro": "Rawafid is a companion platform for school counselors. During a 1:1 or group session, it gathers subtle signals (biometric readings from a hand-rest sensor the student places their palm on, tone of voice from the microphone) and turns them into gentle observations and suggested conversational moves — visible only to the counselor.\n\nOutside of sessions, it maintains a longitudinal picture of each student: growth over time, suggested interventions, and a private report that can be shared with a parent.\n\nThe platform is bilingual (Arabic + English) and works entirely in the browser. There is no app to install — just sign in and start."
       },
       "gettingStarted": {
         "title": "Getting Started",
@@ -671,14 +671,14 @@
       },
       "sessions": {
         "title": "Individual Sessions (1:1)",
-        "intro": "A 1:1 session pairs a counselor with a single student. During the session, biometric readings from the wearable and voice level from the browser mic feed into the AI, which returns brief observations and suggested conversational moves — all visible only on the counselor's screen.",
+        "intro": "A 1:1 session pairs a counselor with a single student. During the session, biometric readings from the hand-rest sensor and voice level from the browser mic feed into the AI, which returns brief observations and suggested conversational moves — all visible only on the counselor's screen.",
         "sub1": {
           "heading": "Starting a session",
           "body": "From the student profile, click 'Start session' (top right). You're taken to the live session view. The student is not shown anything — this is the counselor's dashboard."
         },
         "sub2": {
-          "heading": "Pairing the wearable",
-          "body": "Click 'Pair wearable' — the browser opens a Bluetooth chooser showing nearby ESP32 wristbands. Pick yours and confirm. A connection dot turns green. Readings start flowing every few seconds. If you don't have hardware yet, click 'Simulate' — the platform generates fake readings so you can exercise the whole flow."
+          "heading": "Pairing the hand-rest sensor",
+          "body": "Ask the student to rest their hand comfortably on the hand-shaped sensor pad, then click 'Pair device' — the browser opens a Bluetooth chooser showing nearby ESP32 sensors. Pick yours and confirm. A connection dot turns green. Readings start flowing every few seconds. If you don't have hardware yet, click 'Simulate' — the platform generates fake readings so you can exercise the whole flow."
         },
         "sub3": {
           "heading": "Live vitals",
@@ -694,7 +694,7 @@
         },
         "sub6": {
           "heading": "Ending the session",
-          "body": "When you're done, click 'End session' at the bottom of the live view. You're taken to the session summary page. The wearable is disconnected automatically."
+          "body": "When you're done, click 'End session' at the bottom of the live view. You're taken to the session summary page. The hand-rest sensor is disconnected automatically."
         },
         "sub7": {
           "heading": "Session summary",
@@ -703,7 +703,7 @@
       },
       "groups": {
         "title": "Group Sessions",
-        "intro": "A group session is a facilitated discussion with two or more students. Unlike 1:1 sessions, there's no wearable — just the browser mic capturing the room. The AI observes group dynamics, not per-student states.",
+        "intro": "A group session is a facilitated discussion with two or more students. Unlike 1:1 sessions, there's no hand-rest sensor — just the browser mic capturing the room. The AI observes group dynamics, not per-student states.",
         "sub1": {
           "heading": "Creating a group session",
           "body": "Sessions page → click 'Group sessions' → click 'New group session'. Fill in a title (e.g. 'Exam stress workshop'), an optional topic, then pick two or more participants from the eligible list (only students with granted consent appear here). Click 'Start session'."

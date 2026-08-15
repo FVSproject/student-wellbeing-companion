@@ -8,7 +8,7 @@ export function cn(...inputs: ClassValue[]) {
 /**
  * Map raw skin-conductance (µS) to a 0–100 "nervousness" scale for display.
  *
- * The wearable stores the raw µS value — that's what the AI analyzer reasons
+ * The hand-rest sensor stores the raw µS value — that's what the AI analyzer reasons
  * over and what shows up in exported reports. This helper is a UX-only view
  * transform, not a change to the underlying data.
  *

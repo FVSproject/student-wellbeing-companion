@@ -1,5 +1,5 @@
 /*
-  Student Wellbeing Companion — wearable firmware
+  Student Wellbeing Companion — hand-rest sensor firmware
   =================================================
   Target : ESP32 DevKitC-32 (WROOM, 38-pin)
   Sensors: MAX30102 (HR + SpO2), MLX90614 (skin temp), Grove GSR
@@ -378,7 +378,7 @@ static void fillSampleBundle(SampleBundle& b) {
 void setup() {
   Serial.begin(115200);
   delay(100);
-  Serial.println("\n[boot] Student Wellbeing Companion wearable");
+  Serial.println("\n[boot] Student Wellbeing Companion hand-rest sensor");
 
   pinMode(PIN_STATUS_LED, OUTPUT);
   digitalWrite(PIN_STATUS_LED, LOW);

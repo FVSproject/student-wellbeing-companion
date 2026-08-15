@@ -346,7 +346,7 @@ function statFor(
 }
 
 function summarizeMetrics(window: SessionSample[], baseline: SessionSample[]) {
-  // Motion + battery excluded: current wearable build (no MPU-6050, no divider)
+  // Motion + battery excluded: current hand-rest sensor build (no MPU-6050, no divider)
   // always sends 0 for both, so feeding them to Claude would just be noise.
   return {
     heartRate: statFor(window, baseline, 'heartRate'),

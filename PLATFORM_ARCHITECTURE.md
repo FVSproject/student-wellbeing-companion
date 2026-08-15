@@ -25,7 +25,7 @@ Companion to `PROJECT.md` (hardware/firmware/AI scope). This file scopes the **w
 1. **Auth & onboarding** — Foundation invites a school → school admin invites counselor(s). Role-based access control.
 2. **Student roster** — per-school list, linked to consent status.
 3. **Consent management** — parental/student consent record per student; session start is blocked until consent is on file.
-4. **Device pairing** — associate a physical wearable with a counselor/session (QR code or manual device ID entry recommended).
+4. **Device pairing** — associate a physical hand-rest sensor with a counselor/session (QR code or manual device ID entry recommended).
 5. **Live session view** — real-time biometric stream + rolling AI guidance while a session is in progress. Counselor-only view; nothing analytical is shown on the student's device.
 6. **Session history** — past sessions per student; trend view across sessions (e.g. GSR/HR baseline drift over time).
 7. **AI analysis engine** — receives transcript + biometric bundle every N seconds, calls Claude API server-side, stores structured output (state summary + suggested approach).
@@ -61,7 +61,7 @@ Foundation
      └─ Student
          └─ ConsentRecord (status, date, guardian info)
          └─ Session
-             └─ Device (paired wearable, device ID)
+             └─ Device (paired hand-rest sensor, device ID)
              └─ SessionSample[] (time-series: timestamp, HR, HRV, GSR, temp, motion score)
              └─ TranscriptSegment[] (timestamp, text)
              └─ AIAnalysis[] (timestamp, state summary, suggested approach — counselor-facing only)
@@ -78,7 +78,7 @@ Notes:
 ## 5. Data flow (device → dashboard)
 
 ```
-ESP32 wearable
+ESP32 hand-rest sensor
    │ WiFi, biometric JSON every ~5s
    ▼
 Ingestion API route (Next.js API route, validates schoolId/deviceId/session token)

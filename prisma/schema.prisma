@@ -177,7 +177,7 @@ model Student {
 }
 
 // Group counseling session — 2+ students in one facilitated discussion.
-// Distinct from 1:1 Session: no wearable ingestion, no per-student transcript.
+// Distinct from 1:1 Session: no hand-rest sensor ingestion, no per-student transcript.
 // The counselor captures a shared summary + suggestion after the meeting.
 model GroupSession {
   id          String        @id @default(cuid())
@@ -283,7 +283,7 @@ model Device {
   id           String       @id @default(cuid())
   schoolId     String
   name         String
-  // BLE MAC address or user-assigned serial (e.g. printed on wristband).
+  // BLE MAC address or user-assigned serial (e.g. printed on the hand-rest sensor).
   serialNumber String       @unique
   status       DeviceStatus @default(UNPAIRED)
   lastSeenAt   DateTime?
