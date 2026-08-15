@@ -43,18 +43,19 @@ export default async function DocsPage({
     icon: React.ComponentType<{ className?: string }>;
     key: string;
     subCount: number;
+    hasTip?: boolean;
   }> = [
     { id: 'intro', icon: BookOpen, key: 'intro', subCount: 0 },
-    { id: 'start', icon: Rocket, key: 'gettingStarted', subCount: 4 },
+    { id: 'start', icon: Rocket, key: 'gettingStarted', subCount: 4, hasTip: true },
     { id: 'sidebar', icon: Menu, key: 'sidebar', subCount: 6 },
     { id: 'students', icon: Users, key: 'students', subCount: 5 },
-    { id: 'consent', icon: ShieldCheck, key: 'consent', subCount: 4 },
+    { id: 'consent', icon: ShieldCheck, key: 'consent', subCount: 4, hasTip: true },
     { id: 'sessions', icon: Radio, key: 'sessions', subCount: 7 },
     { id: 'groups', icon: Users, key: 'groups', subCount: 6 },
     { id: 'ai', icon: Sparkles, key: 'ai', subCount: 4 },
     { id: 'chat', icon: MessageCircle, key: 'chat', subCount: 3 },
     { id: 'interventions', icon: Lightbulb, key: 'interventions', subCount: 2 },
-    { id: 'parents', icon: Baby, key: 'parents', subCount: 5 },
+    { id: 'parents', icon: Baby, key: 'parents', subCount: 5, hasTip: true },
     { id: 'reports', icon: FileText, key: 'reports', subCount: 4 },
     { id: 'admin', icon: UserRoundCog, key: 'admin', subCount: 3 },
     { id: 'lang', icon: Languages, key: 'lang', subCount: 2 },
@@ -144,8 +145,8 @@ export default async function DocsPage({
                   heading: t(`sections.${s.key}.sub${idx}.heading`),
                   body: t(`sections.${s.key}.sub${idx}.body`),
                 })}
-                tipHeading={safeT(t, `sections.${s.key}.tipHeading`)}
-                tipBody={safeT(t, `sections.${s.key}.tipBody`)}
+                tipHeading={s.hasTip ? t(`sections.${s.key}.tipHeading`) : null}
+                tipBody={s.hasTip ? t(`sections.${s.key}.tipBody`) : null}
               />
             ))}
 
@@ -243,17 +244,3 @@ function Section({
   );
 }
 
-/** next-intl throws on missing keys — this catches so optional tips can be omitted. */
-function safeT(
-  t: (key: string) => string,
-  key: string
-): string | null {
-  try {
-    const v = t(key);
-    // next-intl returns the raw key string when in strict mode with dev config;
-    // treat that as absent too.
-    return v && v !== key ? v : null;
-  } catch {
-    return null;
-  }
-}
