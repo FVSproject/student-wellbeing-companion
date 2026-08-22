@@ -422,21 +422,18 @@ void setup() {
   }
 
   // MAX30102 init tuned for both HR and SpO2:
-  //   ledBrightness = 0x0A (~1/3 of previous 0x1F) — reduced to lower
-  //     peak current draw on the shared 3V3 rail, which was causing BLE
-  //     radio brown-outs on the XIAO ESP32-S3. Still enough signal for
-  //     finger-on-sensor HR detection.
+  //   ledBrightness = 0x1F (moderate) — Red LED needs adequate signal for SpO2
   //   sampleAverage = 4 (internal averaging)
   //   ledMode       = 2 (Red + IR, required for SpO2)
   //   sampleRate    = 100 Hz  → 25 Hz after 4x averaging → 4 s per 100-sample window
   //   pulseWidth    = 411 µs, adcRange = 4096
   if (hrSensor.begin(Wire, I2C_SPEED_STANDARD)) {
-    hrSensor.setup(0x0A, 4, 2, 100, 411, 4096);
-    hrSensor.setPulseAmplitudeRed(0x0A);
-    hrSensor.setPulseAmplitudeIR(0x0A);
+    hrSensor.setup(0x1F, 4, 2, 100, 411, 4096);
+    hrSensor.setPulseAmplitudeRed(0x1F);
+    hrSensor.setPulseAmplitudeIR(0x1F);
     hrSensor.setPulseAmplitudeGreen(0);
     hrSensorOk = true;
-    Serial.println("[boot] MAX30102 ready (LEDs at 0x0A to protect BLE)");
+    Serial.println("[boot] MAX30102 ready");
   } else {
     Serial.println("[boot] MAX30102 NOT FOUND — check I2C wiring / power");
   }
