@@ -436,6 +436,23 @@ void setup() {
   Wire.begin(PIN_I2C_SDA, PIN_I2C_SCL, 100000);
   delay(250);
 
+  Serial.printf("[boot] I2C on SDA=D4(GPIO %u)  SCL=D5(GPIO %u) @100kHz\n",
+                PIN_I2C_SDA, PIN_I2C_SCL);
+  Serial.println("[boot] Scanning I2C bus…");
+  uint8_t found = 0;
+  for (uint8_t addr = 1; addr < 127; addr++) {
+    Wire.beginTransmission(addr);
+    if (Wire.endTransmission() == 0) {
+      Serial.printf("[boot]   found device @ 0x%02X\n", addr);
+      found++;
+    }
+  }
+  if (found == 0) {
+    Serial.println("[boot]   (no devices responded — check wiring / power / pull-ups)");
+  } else {
+    Serial.printf("[boot]   total: %u device(s)\n", found);
+  }
+
   // MAX30102 setup tuned for BOTH HR and SpO2:
   //   ledBrightness = 0x1F (moderate) — Red LED needs adequate signal for SpO2
   //   sampleAverage = 4
