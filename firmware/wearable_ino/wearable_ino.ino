@@ -91,6 +91,12 @@ struct SampleBundle {
 #pragma pack(pop)
 static_assert(sizeof(SampleBundle) == 21, "SampleBundle must be 21 bytes packed");
 
+// Explicit forward declarations for functions that take SampleBundle&.
+// The Arduino IDE preprocessor auto-generates prototypes at the top of the
+// file (BEFORE the struct is defined) which breaks compilation. Declaring
+// them here after the struct suppresses the auto-generated ones.
+void fillSampleBundle(SampleBundle& b);
+
 // ---------- sensor objects ----------
 MAX30105          hrSensor;
 Adafruit_MLX90614 tempSensor;
