@@ -327,8 +327,17 @@ export function SessionLivePanel({
     }
     setConnState('pairing');
     try {
+      // Two filters — Chrome shows a device if ANY matches. This is more
+      // forgiving than UUID-only: some ESP32 BLE stacks don't consistently
+      // include the 128-bit UUID in the primary advertisement packet, but
+      // they always broadcast the name. `optionalServices` still lets us
+      // access the sample characteristic after pairing.
       const device = await nav.bluetooth.requestDevice({
-        filters: [{ services: [BLE.SERVICE_UUID] }],
+        filters: [
+          { services: [BLE.SERVICE_UUID] },
+          { namePrefix: 'Wellbeing' },
+        ],
+        optionalServices: [BLE.SERVICE_UUID],
       });
       const server = await device.gatt!.connect();
       const service = await server.getPrimaryService(BLE.SERVICE_UUID);
