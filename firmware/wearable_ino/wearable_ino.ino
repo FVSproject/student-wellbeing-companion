@@ -499,22 +499,13 @@ void setup() {
 
   service->start();
 
-  // Split into ADV + scan response — a 128-bit UUID (16 bytes) plus a 12-char
-  // name overflows the 31-byte primary advertising packet, which causes
-  // Chrome's Web Bluetooth filter to hide the device. Put the UUID in the
-  // primary packet (that's what the filter checks) and the name in the
-  // scan response (that's what the chooser displays).
+  // Original advertising setup — proven to work on both ESP32 DevKitC and
+  // XIAO ESP32-S3. The library auto-splits UUID (primary ADV) and name
+  // (scan response) when both are enabled. Chrome's filter reads the UUID
+  // from the primary ADV, so this is sufficient.
   BLEAdvertising* adv = BLEDevice::getAdvertising();
-
-  BLEAdvertisementData advData;
-  advData.setFlags(0x06); // BR/EDR not supported | LE General Discoverable
-  advData.setCompleteServices(BLEUUID(SERVICE_UUID));
-
-  BLEAdvertisementData scanResp;
-  scanResp.setName(BLE_DEVICE_NAME);
-
-  adv->setAdvertisementData(advData);
-  adv->setScanResponseData(scanResp);
+  adv->addServiceUUID(SERVICE_UUID);
+  adv->setScanResponse(true);
   adv->setMinPreferred(0x06);
   adv->setMaxPreferred(0x12);
   BLEDevice::startAdvertising();
