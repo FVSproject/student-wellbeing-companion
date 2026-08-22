@@ -452,6 +452,10 @@ void setup() {
   // BLE init
   BLEDevice::init(BLE_DEVICE_NAME);
   BLEDevice::setMTU(64); // Bundle is 21 bytes; default 23 works but we ask for more.
+  // Crank TX power to maximum so a marginally-attached antenna or a slightly
+  // noisy 3.3V rail still leaves a discoverable signal in Chrome's scanner.
+  BLEDevice::setPower(ESP_PWR_LVL_P9, ESP_BLE_PWR_TYPE_ADV);
+  BLEDevice::setPower(ESP_PWR_LVL_P9, ESP_BLE_PWR_TYPE_DEFAULT);
 
   bleServer = BLEDevice::createServer();
   bleServer->setCallbacks(new ServerCallbacks());
@@ -473,13 +477,13 @@ void setup() {
 
   service->start();
 
-  // Original advertising setup — proven to work on both ESP32 DevKitC and
-  // XIAO ESP32-S3. The library auto-splits UUID (primary ADV) and name
-  // (scan response) when both are enabled. Chrome's filter reads the UUID
-  // from the primary ADV, so this is sufficient.
+  // Advertising: fast interval (~30-60 ms) so Chrome's scanner catches the
+  // device in its short scan window. Default is 1.28 s which often misses.
   BLEAdvertising* adv = BLEDevice::getAdvertising();
   adv->addServiceUUID(SERVICE_UUID);
   adv->setScanResponse(true);
+  adv->setMinInterval(0x20);   // 0x20 * 0.625 ms = 20 ms
+  adv->setMaxInterval(0x60);   // 0x60 * 0.625 ms = 60 ms
   adv->setMinPreferred(0x06);
   adv->setMaxPreferred(0x12);
   BLEDevice::startAdvertising();
