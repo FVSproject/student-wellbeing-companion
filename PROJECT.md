@@ -28,7 +28,7 @@
 | 3 | GY-906 MLX90614 | Contactless skin temperature | I2C — addr `0x5A` |
 | 4 | INMP441 | I2S digital mic (voice capture) | I2S |
 | 5 | MPU-6050 | Motion / fidgeting (accel + gyro) | I2C — addr `0x68` |
-| 6 | ESP32 DevKitC-32 (WROOM, 38-pin) | Main controller, WiFi/BT | — |
+| 6 | Seeed Studio XIAO ESP32-S3 | Main controller, WiFi/BT, USB-C, on-board LiPo charger | — |
 | 7 | LiPo battery 3.7V 1000mAh | Power source | — |
 | 8 | JSD19 1S charger + boost module | Battery charge/power management | — |
 | 9 | Jumper wires M-M, 40pcs | Wiring | — |
@@ -77,18 +77,31 @@ Full costed BOM: `Student_Wellbeing_Electronics_Cost_Analysis.xlsx` (already gen
 
 ---
 
-## 4. ESP32 pin map (proposed — confirm against your specific DevKitC-32 pinout before wiring)
+## 4. XIAO ESP32-S3 pin map
 
-| Signal | Sensor | ESP32 GPIO (suggested) |
-|---|---|---|
-| SDA | MAX30102 / MLX90614 / MPU-6050 | GPIO 21 |
-| SCL | MAX30102 / MLX90614 / MPU-6050 | GPIO 22 |
-| GSR analog out | Grove GSR | GPIO 34 (ADC1) |
-| I2S WS (LRCLK) | INMP441 | GPIO 25 |
-| I2S SCK (BCLK) | INMP441 | GPIO 26 |
-| I2S SD (data) | INMP441 | GPIO 27 |
-| Status LED | — | GPIO 2 (onboard) or external |
-| Battery voltage sense (optional) | — | GPIO 35 (ADC1) |
+Controller: **Seeed Studio XIAO ESP32-S3** (11-pin, USB-C, on-board LiPo
+charger, 8 MB Flash + 8 MB PSRAM). Silkscreen labels `D0`–`D10` map to
+underlying GPIOs — the table below shows both.
+
+| Signal | Sensor | XIAO pin | GPIO |
+|---|---|---|---|
+| SDA (shared I2C) | MAX30102 · MLX90614 | **D4** | GPIO 5 |
+| SCL (shared I2C) | MAX30102 · MLX90614 | **D5** | GPIO 6 |
+| Analog | Grove GSR (yellow / SIG) | **D0** | GPIO 1 (ADC1_CH0) |
+| Battery voltage sense (optional) | — | **D1** | GPIO 2 (ADC1_CH1) |
+| Status LED (on-board) | — | LED_BUILTIN | GPIO 21 (**active-LOW**) |
+| Sensor VCC | MAX30102 · MLX90614 · Grove GSR (red) | **3V3** | — |
+| Sensor GND | MAX30102 · MLX90614 · Grove GSR (black) | **GND** | — |
+| LiPo battery | on-board charger | **BAT+ / BAT-** | — |
+
+Notes:
+- MAX30102 (0x57), MLX90614 (0x5A) share the I2C bus with no address conflict.
+- The on-board LED is active-LOW; firmware wraps this in `ledOn()`/`ledOff()`
+  helpers so the outward behaviour matches earlier boards.
+- USB-C handles both flashing and LiPo charging — no separate charger needed.
+- INMP441 (mic) and MPU-6050 (motion) are no longer part of the build. Voice
+  is captured via the counselor's browser mic; motion is unused for this form
+  factor (the student's hand rests still on the pad).
 
 ---
 

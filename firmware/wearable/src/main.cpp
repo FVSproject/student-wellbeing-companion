@@ -1,12 +1,19 @@
 /*
   Student Wellbeing Companion — hand-rest sensor firmware
   =================================================
-  Target : ESP32 DevKitC-32 (WROOM, 38-pin)
+  Target : Seeed Studio XIAO ESP32-S3 (11-pin, USB-C, on-board LiPo charger)
   Sensors: MAX30102 (HR + SpO2), MLX90614 (skin temp), Grove GSR
-  Power  : LiPo 1000mAh → JSD19 boost → ESP32 VIN
+  Power  : LiPo direct to XIAO BAT+/BAT- pads (on-board charger)
   Comms  : BLE GATT — the counselor's browser pairs via Web Bluetooth.
 
   Wire the sensors per firmware/wearable/README.md.
+
+  Pin notes for XIAO ESP32-S3 (silkscreen → GPIO):
+    D4 = GPIO 5  → SDA (I2C default)
+    D5 = GPIO 6  → SCL (I2C default)
+    D0 = GPIO 1  → GSR analog (ADC1_CH0)
+    D1 = GPIO 2  → optional battery-sense (ADC1_CH1)
+    LED_BUILTIN = GPIO 21 → on-board yellow LED (ACTIVE-LOW)
 
   The BLE service contract MUST stay in sync with
   D:/Projects/2026-2027/Student Wellbeing Companion/src/lib/ble.ts on the
@@ -28,12 +35,19 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 
-// ---------- pins ----------
-constexpr uint8_t PIN_I2C_SDA      = 21;
-constexpr uint8_t PIN_I2C_SCL      = 22;
-constexpr uint8_t PIN_GSR          = 34;   // ADC1_CH6, input-only
-constexpr uint8_t PIN_BATT_SENSE   = 35;   // ADC1_CH7, optional divider
-constexpr uint8_t PIN_STATUS_LED   = 2;    // onboard blue LED
+// ---------- pins (XIAO ESP32-S3) ----------
+constexpr uint8_t PIN_I2C_SDA      = 5;    // D4  — I2C SDA default
+constexpr uint8_t PIN_I2C_SCL      = 6;    // D5  — I2C SCL default
+constexpr uint8_t PIN_GSR          = 1;    // D0  — ADC1_CH0
+constexpr uint8_t PIN_BATT_SENSE   = 2;    // D1  — ADC1_CH1, optional divider
+constexpr uint8_t PIN_STATUS_LED   = 21;   // LED_BUILTIN, ACTIVE-LOW yellow LED
+
+// XIAO's built-in LED is inverted: LOW = on, HIGH = off.
+inline void ledOn()  { digitalWrite(PIN_STATUS_LED, LOW); }
+inline void ledOff() { digitalWrite(PIN_STATUS_LED, HIGH); }
+inline void ledToggle() {
+  digitalWrite(PIN_STATUS_LED, !digitalRead(PIN_STATUS_LED));
+}
 
 // ---------- BLE identifiers (must match src/lib/ble.ts) ----------
 constexpr char BLE_DEVICE_NAME[]     = "Wellbeing-01";
@@ -141,12 +155,12 @@ bool tempSensorOk = false;
 class ServerCallbacks : public BLEServerCallbacks {
   void onConnect(BLEServer* /*server*/) override {
     clientConnected = true;
-    digitalWrite(PIN_STATUS_LED, HIGH);
+    ledOn();  // solid = paired
     Serial.println("[ble] client connected");
   }
   void onDisconnect(BLEServer* server) override {
     clientConnected = false;
-    digitalWrite(PIN_STATUS_LED, LOW);
+    ledOff();
     Serial.println("[ble] client disconnected — restarting advertising");
     // Slight delay lets the stack clean up before re-advertising.
     delay(200);
@@ -381,7 +395,7 @@ void setup() {
   Serial.println("\n[boot] Student Wellbeing Companion hand-rest sensor");
 
   pinMode(PIN_STATUS_LED, OUTPUT);
-  digitalWrite(PIN_STATUS_LED, LOW);
+  ledOff();
 
   analogReadResolution(12); // 0..4095 for GSR + battery
 
@@ -488,7 +502,7 @@ void loop() {
   if (!clientConnected && advertising) {
     if (now - lastBlinkMs >= 1000) {
       lastBlinkMs = now;
-      digitalWrite(PIN_STATUS_LED, !digitalRead(PIN_STATUS_LED));
+      ledToggle();
     }
   }
 

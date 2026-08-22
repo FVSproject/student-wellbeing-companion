@@ -1,9 +1,9 @@
 /*
   Student Wellbeing Companion — hand-rest sensor firmware (Arduino IDE version)
   =====================================================================
-  Target : ESP32 DevKitC-32 (WROOM, 38-pin)
+  Target : Seeed Studio XIAO ESP32-S3 (11-pin, USB-C, on-board LiPo charger)
   Sensors: MAX30102 (HR + SpO2), MLX90614 (skin temp), Grove GSR
-  Power  : LiPo 1000mAh → JSD19 boost → ESP32 VIN
+  Power  : LiPo → XIAO BAT+/BAT- pads (on-board charger via USB-C)
   Comms  : BLE GATT — the counselor's browser pairs via Web Bluetooth.
 
   ------------------------------------------------------------------
@@ -12,28 +12,33 @@
   1. Install ESP32 boards package:
        Preferences → Additional Board Manager URLs:
          https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
-       Boards Manager → search "esp32" → install.
+       Boards Manager → search "esp32" → install (v2.0.14 or later).
 
   2. Select the board:
-       Tools → Board → ESP32 Arduino → "ESP32 Dev Module"
-       Tools → Upload Speed → 921600
+       Tools → Board → ESP32 Arduino → "XIAO_ESP32S3"
+       Tools → USB CDC On Boot → "Enabled"   (so Serial works over USB-C)
        Tools → Partition Scheme → "Huge APP (3MB No OTA/1MB SPIFFS)"
+       Tools → Upload Speed → 921600
 
   3. Install libraries (Sketch → Include Library → Manage Libraries):
        - "SparkFun MAX3010x Pulse and Proximity Sensor Library"
        - "Adafruit MLX90614 Library"
 
-  4. Flash. Open Serial Monitor at 115200 baud.
+  4. Flash. If flashing fails, put the XIAO in bootloader mode: hold BOOT,
+     tap RESET, release BOOT. Open Serial Monitor at 115200 baud.
   ------------------------------------------------------------------
 
-  WIRING:
-    GPIO 21  → SDA (MAX30102 + MLX90614)
-    GPIO 22  → SCL (MAX30102 + MLX90614)
-    GPIO 34  → GSR yellow (SIG)
-    GPIO 35  → battery voltage divider midpoint (optional)
-    3V3      → sensor VCC
-    GND      → sensor GND (star topology)
-    VIN      → JSD19 boost OUT+ (5V)
+  WIRING (XIAO ESP32-S3 silkscreen labels):
+    D4  (GPIO 5)  → SDA (MAX30102 + MLX90614)
+    D5  (GPIO 6)  → SCL (MAX30102 + MLX90614)
+    D0  (GPIO 1)  → GSR yellow (SIG)             — ADC1_CH0
+    D1  (GPIO 2)  → battery voltage divider mid  — ADC1_CH1, optional
+    3V3           → sensor VCC (MAX30102, MLX90614, Grove GSR red)
+    GND           → sensor GND (star topology)
+    BAT+, BAT-    → LiPo (on-board charger — USB-C charges the pack)
+
+  LED: LED_BUILTIN (GPIO 21) — the on-board yellow LED is ACTIVE-LOW,
+       so writing LOW turns it on.
 
   Sample bundle protocol MUST match src/lib/ble.ts on the web platform.
 */
@@ -51,12 +56,19 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 
-// ---------- pins ----------
-const uint8_t PIN_I2C_SDA    = 21;
-const uint8_t PIN_I2C_SCL    = 22;
-const uint8_t PIN_GSR        = 34;
-const uint8_t PIN_BATT_SENSE = 35;
-const uint8_t PIN_STATUS_LED = 2;
+// ---------- pins (XIAO ESP32-S3) ----------
+const uint8_t PIN_I2C_SDA    = 5;   // D4  — I2C SDA default
+const uint8_t PIN_I2C_SCL    = 6;   // D5  — I2C SCL default
+const uint8_t PIN_GSR        = 1;   // D0  — ADC1_CH0
+const uint8_t PIN_BATT_SENSE = 2;   // D1  — ADC1_CH1, optional divider
+const uint8_t PIN_STATUS_LED = 21;  // LED_BUILTIN, ACTIVE-LOW yellow LED
+
+// The XIAO's on-board LED is inverted vs. classic ESP32 DevKit: LOW = on.
+inline void ledOn()     { digitalWrite(PIN_STATUS_LED, LOW); }
+inline void ledOff()    { digitalWrite(PIN_STATUS_LED, HIGH); }
+inline void ledToggle() {
+  digitalWrite(PIN_STATUS_LED, !digitalRead(PIN_STATUS_LED));
+}
 
 // ---------- BLE identifiers (must match src/lib/ble.ts) ----------
 const char* BLE_DEVICE_NAME       = "Wellbeing-01";
@@ -168,12 +180,12 @@ bool tempSensorOk = false;
 class ServerCallbacks : public BLEServerCallbacks {
   void onConnect(BLEServer*) {
     clientConnected = true;
-    digitalWrite(PIN_STATUS_LED, HIGH);
+    ledOn();  // solid = paired
     Serial.println("[ble] client connected");
   }
   void onDisconnect(BLEServer* server) {
     clientConnected = false;
-    digitalWrite(PIN_STATUS_LED, LOW);
+    ledOff();
     Serial.println("[ble] client disconnected — restarting advertising");
     delay(200);
     server->startAdvertising();
@@ -410,7 +422,7 @@ void setup() {
   Serial.println("\n[boot] Student Wellbeing Companion hand-rest sensor");
 
   pinMode(PIN_STATUS_LED, OUTPUT);
-  digitalWrite(PIN_STATUS_LED, LOW);
+  ledOff();
 
   analogReadResolution(12);
 
@@ -519,7 +531,7 @@ void loop() {
   if (!clientConnected && advertising) {
     if (now - lastBlinkMs >= 1000) {
       lastBlinkMs = now;
-      digitalWrite(PIN_STATUS_LED, !digitalRead(PIN_STATUS_LED));
+      ledToggle();
     }
   }
 
