@@ -1,14 +1,13 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PageHeader } from '@/components/page-header';
-import { ConsentBadge } from '@/components/status-badge';
 import { TimeSeriesChart } from '@/components/timeseries-chart';
 import { PrintButton } from '@/components/print-button';
 import { GrowthCard, type GrowthMetrics } from '@/components/growth-card';
 import { ReportChat } from '@/components/report-chat';
 import { getCounselorContext } from '@/lib/auth';
 import { recordAudit } from '@/lib/audit';
-import { ConsentStatus, SessionStatus } from '@prisma/client';
+import { SessionStatus } from '@prisma/client';
 import { regenerateStudentGrowth } from '../../growth-actions';
 
 export const dynamic = 'force-dynamic';
@@ -23,7 +22,6 @@ export default async function StudentReportPage({
   const t = await getTranslations('report');
   const tCommon = await getTranslations('students');
   const tLive = await getTranslations('sessions.live');
-  const tStatus = await getTranslations('consent.status');
   const tGrowth = await getTranslations('report.growth');
   const tChat = await getTranslations('chat');
   const chatLocale: 'en' | 'ar' = locale === 'ar' ? 'ar' : 'en';
@@ -32,7 +30,6 @@ export default async function StudentReportPage({
   const student = await db.student.findFirst({
     where: { id, deletedAt: null },
     include: {
-      consent: true,
       school: true,
     },
   });
@@ -76,7 +73,6 @@ export default async function StudentReportPage({
   });
 
   const totalMinutes = perSession.reduce((a, b) => a + b.duration, 0);
-  const consentStatus = student.consent?.status ?? ConsentStatus.PENDING;
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 print:max-w-full">
@@ -94,7 +90,6 @@ export default async function StudentReportPage({
             </div>
             <div className="mt-0.5 text-lg font-semibold">{student.fullName}</div>
           </div>
-          <ConsentBadge status={consentStatus} label={tStatus(consentStatus)} />
         </div>
         <dl className="grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
           <Info label={tCommon('externalId')} value={student.externalId} />

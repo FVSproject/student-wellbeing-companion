@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { CalendarClock, Users, ShieldCheck } from 'lucide-react';
+import { CalendarClock, Users } from 'lucide-react';
 import { UserRole } from '@prisma/client';
 import { Link } from '@/i18n/routing';
 import { PageHeader } from '@/components/page-header';
@@ -25,10 +25,9 @@ export default async function DashboardHome({
   const tCommon = await getTranslations('nav');
   const { db, user } = await getSchoolContext();
 
-  const [studentCount, activeSessionCount, pendingConsentCount] = await Promise.all([
+  const [studentCount, activeSessionCount] = await Promise.all([
     db.student.count({ where: { deletedAt: null } }),
     db.session.count({ where: { status: 'ACTIVE' } }),
-    db.consentRecord.count({ where: { status: 'PENDING' } }),
   ]);
 
   return (
@@ -38,7 +37,7 @@ export default async function DashboardHome({
         description={t('welcomeBody')}
       />
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2">
         <StatCard
           icon={<Users className="h-5 w-5" />}
           label={tCommon('students')}
@@ -50,12 +49,6 @@ export default async function DashboardHome({
           label={t('activeSessions')}
           value={activeSessionCount}
           href="/sessions"
-        />
-        <StatCard
-          icon={<ShieldCheck className="h-5 w-5" />}
-          label={t('pendingConsents')}
-          value={pendingConsentCount}
-          href="/students"
         />
       </div>
 

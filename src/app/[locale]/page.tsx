@@ -3,7 +3,7 @@ import { SignedIn, SignedOut } from '@clerk/nextjs';
 import { Link } from '@/i18n/routing';
 import { LocaleSwitcher } from '@/components/locale-switcher';
 import { BrandMark } from '@/components/brand-mark';
-import { ShieldCheck, Activity, EyeOff } from 'lucide-react';
+import { Activity, EyeOff } from 'lucide-react';
 
 export default async function LandingPage({
   params,
@@ -69,12 +69,7 @@ export default async function LandingPage({
           </div>
         </section>
 
-        <section className="mt-24 grid gap-6 md:grid-cols-3">
-          <FeatureCard
-            icon={<ShieldCheck className="h-5 w-5" />}
-            title={t('featureConsentTitle')}
-            body={t('featureConsentBody')}
-          />
+        <section className="mt-24 grid gap-6 md:grid-cols-2">
           <FeatureCard
             icon={<Activity className="h-5 w-5" />}
             title={t('featureLiveTitle')}

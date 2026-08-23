@@ -2,7 +2,6 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import {
   BookOpen,
   Users,
-  ShieldCheck,
   Radio,
   Sparkles,
   MessageCircle,
@@ -49,7 +48,6 @@ export default async function DocsPage({
     { id: 'start', icon: Rocket, key: 'gettingStarted', subCount: 4, hasTip: true },
     { id: 'sidebar', icon: Menu, key: 'sidebar', subCount: 6 },
     { id: 'students', icon: Users, key: 'students', subCount: 5 },
-    { id: 'consent', icon: ShieldCheck, key: 'consent', subCount: 4, hasTip: true },
     { id: 'sessions', icon: Radio, key: 'sessions', subCount: 7 },
     { id: 'groups', icon: Users, key: 'groups', subCount: 6 },
     { id: 'ai', icon: Sparkles, key: 'ai', subCount: 4 },

@@ -1,13 +1,12 @@
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { CalendarClock, ShieldCheck, TrendingUp } from 'lucide-react';
+import { CalendarClock, TrendingUp } from 'lucide-react';
 import { Link } from '@/i18n/routing';
 import { PageHeader } from '@/components/page-header';
-import { ConsentBadge, SessionBadge } from '@/components/status-badge';
+import { SessionBadge } from '@/components/status-badge';
 import { SubmitButton } from '@/components/submit-button';
 import { getCounselorContext } from '@/lib/auth';
 import { recordAudit } from '@/lib/audit';
-import { ConsentStatus } from '@prisma/client';
 import { headers } from 'next/headers';
 import { startSession } from '../../sessions/actions';
 import { deleteStudent, createParentShareLink, revokeParentShareLink } from '../actions';
@@ -26,15 +25,12 @@ export default async function StudentDetailPage({
   setRequestLocale(locale);
 
   const t = await getTranslations('students');
-  const tConsent = await getTranslations('consent');
-  const tStatus = await getTranslations('consent.status');
   const tSessionStatus = await getTranslations('sessions.status');
   const { db, user, schoolId } = await getCounselorContext(locale);
 
   const student = await db.student.findFirst({
     where: { id, deletedAt: null },
     include: {
-      consent: true,
       school: { select: { name: true } },
       sessions: {
         orderBy: { startedAt: 'desc' },
@@ -61,7 +57,6 @@ export default async function StudentDetailPage({
     targetId: student.id,
   });
 
-  const consentStatus = student.consent?.status ?? ConsentStatus.PENDING;
   const tSex = await getTranslations('students.sex');
   const tChat = await getTranslations('chat');
   const tParent = await getTranslations('parentAccess');
@@ -83,13 +78,6 @@ export default async function StudentDetailPage({
             >
               <TrendingUp className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
               {t('viewTrends')}
-            </Link>
-            <Link
-              href={`/students/${student.id}/consent`}
-              className="btn-ghost"
-            >
-              <ShieldCheck className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-              {tConsent('manage')}
             </Link>
             <form action={startSession}>
               <input type="hidden" name="studentId" value={student.id} />
@@ -122,30 +110,6 @@ export default async function StudentDetailPage({
             </div>
             <p className="mt-1 whitespace-pre-wrap text-sm">{student.notes}</p>
           </div>
-        )}
-      </section>
-
-      <section className="card">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold">{tConsent('title')}</h3>
-          <ConsentBadge status={consentStatus} label={tStatus(consentStatus)} />
-        </div>
-        {student.consent ? (
-          <dl className="mt-4 grid grid-cols-1 gap-3 text-sm md:grid-cols-2">
-            <Info label={tConsent('guardianName')} value={student.consent.guardianName} />
-            <Info label={tConsent('guardianRelation')} value={student.consent.guardianRelation} />
-            <Info label={tConsent('guardianContact')} value={student.consent.guardianContact} />
-            <Info
-              label={tConsent('signedAt')}
-              value={
-                student.consent.signedAt
-                  ? new Date(student.consent.signedAt).toLocaleDateString(locale)
-                  : '—'
-              }
-            />
-          </dl>
-        ) : (
-          <p className="mt-3 text-sm text-muted-foreground">{tConsent('empty')}</p>
         )}
       </section>
 

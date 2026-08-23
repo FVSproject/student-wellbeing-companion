@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { getLocale } from 'next-intl/server';
-import { ConsentStatus, StudentSex } from '@prisma/client';
+import { StudentSex } from '@prisma/client';
 import { getSchoolContext } from '@/lib/auth';
 import { recordAudit } from '@/lib/audit';
 
@@ -75,64 +75,6 @@ export async function createStudent(formData: FormData) {
   const locale = await getLocale();
   revalidatePath(`/${locale}/students`);
   redirect(`/${locale}/students/${student.id}`);
-}
-
-const upsertConsentSchema = z.object({
-  studentId: z.string().min(1),
-  status: z.nativeEnum(ConsentStatus),
-  guardianName: z.preprocess(nonEmpty, z.string().min(1).max(200)),
-  guardianRelation: z.preprocess(nonEmpty, z.string().min(1).max(50)),
-  guardianContact: z.preprocess(nonEmpty, z.string().min(1).max(100)),
-  notes: z.preprocess(nonEmpty, z.string().max(2000).optional().or(z.literal(''))),
-});
-
-export async function upsertConsent(formData: FormData) {
-  const { db, user, schoolId } = await getSchoolContext();
-  const parsed = upsertConsentSchema.parse(Object.fromEntries(formData));
-
-  // Guard: student must belong to this school (findFirst is auto-scoped by schoolId).
-  const student = await db.student.findFirst({ where: { id: parsed.studentId } });
-  if (!student) throw new Error('Student not found in this school');
-
-  const now = new Date();
-  await db.consentRecord.upsert({
-    where: { studentId: parsed.studentId },
-    create: {
-      schoolId,
-      studentId: parsed.studentId,
-      status: parsed.status,
-      guardianName: parsed.guardianName,
-      guardianRelation: parsed.guardianRelation,
-      guardianContact: parsed.guardianContact,
-      notes: parsed.notes || null,
-      signedAt: parsed.status === ConsentStatus.GRANTED ? now : null,
-      revokedAt: parsed.status === ConsentStatus.REVOKED ? now : null,
-    },
-    update: {
-      status: parsed.status,
-      guardianName: parsed.guardianName,
-      guardianRelation: parsed.guardianRelation,
-      guardianContact: parsed.guardianContact,
-      notes: parsed.notes || null,
-      signedAt: parsed.status === ConsentStatus.GRANTED ? now : null,
-      revokedAt: parsed.status === ConsentStatus.REVOKED ? now : null,
-    },
-  });
-
-  recordAudit({
-    actorUserId: user.id,
-    actorClerkUserId: user.clerkUserId,
-    schoolId,
-    action: 'consent.upsert',
-    targetType: 'student',
-    targetId: parsed.studentId,
-    metadata: { status: parsed.status },
-  });
-
-  const locale = await getLocale();
-  revalidatePath(`/${locale}/students`);
-  revalidatePath(`/${locale}/students/${parsed.studentId}`);
-  redirect(`/${locale}/students/${parsed.studentId}`);
 }
 
 const deleteStudentSchema = z.object({ studentId: z.string().min(1) });

@@ -1,7 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import {
   Users,
-  ShieldCheck,
   Bluetooth,
   Activity,
   Sparkles,
@@ -24,7 +23,6 @@ export default async function OverviewPage({
 
   const flow = [
     { icon: <Users className="h-5 w-5" />, key: 'step1' },
-    { icon: <ShieldCheck className="h-5 w-5" />, key: 'step2' },
     { icon: <Bluetooth className="h-5 w-5" />, key: 'step3' },
     { icon: <Activity className="h-5 w-5" />, key: 'step4' },
     { icon: <Sparkles className="h-5 w-5" />, key: 'step5' },
