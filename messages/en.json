@@ -238,7 +238,7 @@
   "consent": {
     "title": "Consent record",
     "manage": "Manage consent",
-    "empty": "No consent record yet — sessions are blocked until one is added.",
+    "empty": "No consent record yet.",
     "gateHint": "A session cannot start without granted consent on file.",
     "guardianName": "Guardian name",
     "guardianRelation": "Relation",
