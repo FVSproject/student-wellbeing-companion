@@ -2,7 +2,6 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { PageHeader } from '@/components/page-header';
 import { GroupSessionForm } from '@/components/group-session-form';
 import { getCounselorContext } from '@/lib/auth';
-import { ConsentStatus } from '@prisma/client';
 import { createGroupSession } from '../actions';
 
 export default async function NewGroupSessionPage({
@@ -18,10 +17,7 @@ export default async function NewGroupSessionPage({
   const { db } = await getCounselorContext(locale);
 
   const students = await db.student.findMany({
-    where: {
-      deletedAt: null,
-      consent: { status: ConsentStatus.GRANTED },
-    },
+    where: { deletedAt: null },
     select: { id: true, fullName: true, gradeLevel: true },
     orderBy: { fullName: 'asc' },
   });

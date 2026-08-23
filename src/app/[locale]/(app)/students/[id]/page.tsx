@@ -62,7 +62,6 @@ export default async function StudentDetailPage({
   });
 
   const consentStatus = student.consent?.status ?? ConsentStatus.PENDING;
-  const canStartSession = consentStatus === ConsentStatus.GRANTED;
   const tSex = await getTranslations('students.sex');
   const tChat = await getTranslations('chat');
   const tParent = await getTranslations('parentAccess');
@@ -94,11 +93,7 @@ export default async function StudentDetailPage({
             </Link>
             <form action={startSession}>
               <input type="hidden" name="studentId" value={student.id} />
-              <SubmitButton
-                disabled={!canStartSession}
-                title={canStartSession ? undefined : tConsent('gateHint')}
-                pendingLabel={t('startSession')}
-              >
+              <SubmitButton pendingLabel={t('startSession')}>
                 <CalendarClock className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
                 {t('startSession')}
               </SubmitButton>
@@ -151,11 +146,6 @@ export default async function StudentDetailPage({
           </dl>
         ) : (
           <p className="mt-3 text-sm text-muted-foreground">{tConsent('empty')}</p>
-        )}
-        {!canStartSession && (
-          <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-xs text-amber-800 ring-1 ring-amber-200">
-            {tConsent('gateHint')}
-          </p>
         )}
       </section>
 

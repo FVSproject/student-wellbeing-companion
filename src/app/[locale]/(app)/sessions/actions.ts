@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { after } from 'next/server';
 import { getLocale } from 'next-intl/server';
-import { ConsentStatus, SessionStatus } from '@prisma/client';
+import { SessionStatus } from '@prisma/client';
 import { getSchoolContext } from '@/lib/auth';
 import { recordAudit } from '@/lib/audit';
 import { generateSessionSummary, generateStudentGrowth } from '@/lib/summaries';
@@ -18,12 +18,8 @@ export async function startSession(formData: FormData) {
 
   const student = await db.student.findFirst({
     where: { id: studentId, deletedAt: null },
-    include: { consent: true },
   });
   if (!student) throw new Error('Student not found');
-  if (student.consent?.status !== ConsentStatus.GRANTED) {
-    throw new Error('Cannot start a session without granted consent');
-  }
 
   const session = await db.session.create({
     data: {
