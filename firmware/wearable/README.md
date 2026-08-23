@@ -1,9 +1,9 @@
-# Hand-rest sensor firmware — Student Wellbeing Companion
+# Bracelet firmware — Student Wellbeing Companion
 
-Firmware for the **Seeed Studio XIAO ESP32-S3** inside the hand-shaped sensor
-pad. Reads the biometric sensors (MAX30102 under the fingertip, GSR under two
-other fingertips, MLX90614 above the back of the hand) and streams the packed
-sample bundle over BLE to the counselor's browser (Web Bluetooth).
+Firmware for the **Seeed Studio XIAO ESP32-S3** inside the bracelet worn by
+the student. Reads the biometric sensors (MAX30102 for HR/SpO2, Grove GSR for
+skin conductance, MLX90614 for contactless skin temperature) and streams the
+packed sample bundle over BLE to the counselor's browser (Web Bluetooth).
 
 ## Board: XIAO ESP32-S3
 
@@ -38,8 +38,8 @@ Silkscreen labels (`D0`–`D10`) map to underlying GPIOs:
 safe reading on the 3.3 V ADC. Without the divider, `batteryPct` in the
 sample bundle reports 0.
 
-**No wristband strap** — the sensors are laid out under a hand-shaped
-enclosure. The student rests their palm on it for the duration of the session.
+The bracelet is worn on the wrist for the duration of the session, with the
+sensor cluster sitting against the inner wrist / palm side.
 
 ## LED behavior
 

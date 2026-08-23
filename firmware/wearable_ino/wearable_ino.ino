@@ -1,5 +1,5 @@
 /*
-  Student Wellbeing Companion — hand-rest sensor firmware (Arduino IDE version)
+  Student Wellbeing Companion — bracelet firmware (Arduino IDE version)
   =====================================================================
   Target : Seeed Studio XIAO ESP32-S3 (11-pin, USB-C, on-board LiPo charger)
   Sensors: MAX30102 (HR + SpO2), MLX90614 (skin temp), Grove GSR
@@ -425,7 +425,7 @@ void fillSampleBundle(SampleBundle& b) {
 void setup() {
   Serial.begin(115200);
   delay(100);
-  Serial.println("\n[boot] Student Wellbeing Companion hand-rest sensor");
+  Serial.println("\n[boot] Student Wellbeing Companion bracelet");
 
   pinMode(PIN_STATUS_LED, OUTPUT);
   ledOff();

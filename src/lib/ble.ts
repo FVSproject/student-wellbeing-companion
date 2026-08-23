@@ -1,5 +1,5 @@
 /**
- * BLE GATT contract between the ESP32 hand-rest sensor and the counselor's browser.
+ * BLE GATT contract between the ESP32 bracelet and the counselor's browser.
  *
  * The ESP32 firmware exposes ONE custom service with characteristics
  * for each data stream. The browser (via Web Bluetooth) subscribes to
@@ -11,7 +11,7 @@
  */
 
 export const BLE = {
-  /** Primary custom service exposed by the hand-rest sensor. */
+  /** Primary custom service exposed by the bracelet. */
   SERVICE_UUID: 'a1b2c3d4-e5f6-4788-9abc-000000001000',
 
   /**

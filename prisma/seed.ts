@@ -80,14 +80,14 @@ async function main() {
     });
   }
 
-  console.log('→ Seeding hand-rest sensor…');
+  console.log('→ Seeding bracelet…');
   const device = await db.device.upsert({
-    where: { serialNumber: 'HANDREST-001' },
+    where: { serialNumber: 'BRACELET-001' },
     create: {
       id: DEVICE_ID,
       schoolId: school.id,
-      name: 'Hand-rest sensor #1',
-      serialNumber: 'HANDREST-001',
+      name: 'Bracelet #1',
+      serialNumber: 'BRACELET-001',
       status: DeviceStatus.PAIRED,
       firmwareRev: '0.1.0',
     },
