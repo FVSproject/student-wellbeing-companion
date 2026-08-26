@@ -4,6 +4,7 @@ import { Link } from '@/i18n/routing';
 import { PageHeader } from '@/components/page-header';
 import { DeleteRowButton } from '@/components/delete-row-button';
 import { Avatar } from '@/components/avatar';
+import { StudentImportDialog } from '@/components/student-import-dialog';
 import { getCounselorContext } from '@/lib/auth';
 import { deleteStudent } from './actions';
 
@@ -16,6 +17,7 @@ export default async function StudentsPage({
   setRequestLocale(locale);
 
   const t = await getTranslations('students');
+  const tImport = await getTranslations('studentImport');
   const { db } = await getCounselorContext(locale);
 
   const students = await db.student.findMany({
@@ -29,10 +31,54 @@ export default async function StudentsPage({
         title={t('title')}
         description={t('subtitle')}
         action={
-          <Link href="/students/new" className="btn-primary">
-            <UserPlus className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
-            {t('addStudent')}
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <StudentImportDialog
+              labels={{
+                triggerButton: tImport('triggerButton'),
+                dialogTitle: tImport('dialogTitle'),
+                dialogSubtitle: tImport('dialogSubtitle'),
+                chooseFile: tImport('chooseFile'),
+                reselectFile: tImport('reselectFile'),
+                downloadTemplate: tImport('downloadTemplate'),
+                parsing: tImport('parsing'),
+                parseError: tImport('parseError'),
+                emptyFile: tImport('emptyFile'),
+                selectAll: tImport('selectAll'),
+                clearAll: tImport('clearAll'),
+                addSelected: tImport('addSelected'),
+                addAll: tImport('addAll'),
+                addOne: tImport('addOne'),
+                remove: tImport('remove'),
+                cancel: tImport('cancel'),
+                close: tImport('close'),
+                importing: tImport('importing'),
+                successTitle: tImport('successTitle'),
+                skippedTitle: tImport('skippedTitle'),
+                skippedDuplicate: tImport('skippedDuplicate'),
+                colId: tImport('colId'),
+                colName: tImport('colName'),
+                colGrade: tImport('colGrade'),
+                colAge: tImport('colAge'),
+                colSex: tImport('colSex'),
+                colPhone: tImport('colPhone'),
+                colParentPhone: tImport('colParentPhone'),
+                colParentEmail: tImport('colParentEmail'),
+                colActions: tImport('colActions'),
+                sexFemale: tImport('sexFemale'),
+                sexMale: tImport('sexMale'),
+                sexUnspecified: tImport('sexUnspecified'),
+                errorMissingRequired: tImport('errorMissingRequired'),
+                errorInvalidEmail: tImport('errorInvalidEmail'),
+                errorInvalidAge: tImport('errorInvalidAge'),
+                helpTitle: tImport('helpTitle'),
+                helpBody: tImport('helpBody'),
+              }}
+            />
+            <Link href="/students/new" className="btn-primary">
+              <UserPlus className="h-4 w-4 ltr:mr-2 rtl:ml-2" />
+              {t('addStudent')}
+            </Link>
+          </div>
         }
       />
 

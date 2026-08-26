@@ -77,6 +77,97 @@ export async function createStudent(formData: FormData) {
   redirect(`/${locale}/students/${student.id}`);
 }
 
+// ---------- bulk import from Excel ----------
+
+const bulkStudentSchema = z.object({
+  externalId: z.string().min(1).max(50),
+  fullName: z.string().min(1).max(200),
+  gradeLevel: z.string().max(50).optional().nullable(),
+  age: z.number().int().min(3).max(25).optional().nullable(),
+  sex: z.nativeEnum(StudentSex).optional().nullable(),
+  phone: z.string().max(30).optional().nullable(),
+  parentPhone: z.string().max(30).optional().nullable(),
+  parentEmail: z.string().email().max(200).optional().nullable(),
+  notes: z.string().max(2000).optional().nullable(),
+});
+
+const createStudentsBulkSchema = z.object({
+  students: z.array(bulkStudentSchema).min(1).max(500),
+});
+
+export type BulkImportResult = {
+  created: number;
+  skipped: Array<{ externalId: string; fullName: string; reason: string }>;
+};
+
+/**
+ * Bulk-create students from a parsed Excel payload. Skips rows whose
+ * externalId already exists in this school (returned in `skipped` for the
+ * counselor to review). Called from the client-side Excel import dialog.
+ */
+export async function createStudentsBulk(
+  input: z.infer<typeof createStudentsBulkSchema>
+): Promise<BulkImportResult> {
+  const { db, user, schoolId } = await getSchoolContext();
+  const parsed = createStudentsBulkSchema.parse(input);
+
+  // Pre-fetch existing externalIds in this school so we can skip duplicates
+  // without hitting a DB constraint per row.
+  const existing = await db.student.findMany({
+    where: { externalId: { in: parsed.students.map((s) => s.externalId) } },
+    select: { externalId: true },
+  });
+  const existingIds = new Set(existing.map((e) => e.externalId));
+
+  const skipped: BulkImportResult['skipped'] = [];
+  const toCreate = parsed.students.filter((s) => {
+    if (existingIds.has(s.externalId)) {
+      skipped.push({
+        externalId: s.externalId,
+        fullName: s.fullName,
+        reason: 'duplicate_external_id',
+      });
+      return false;
+    }
+    return true;
+  });
+
+  if (toCreate.length > 0) {
+    await db.student.createMany({
+      data: toCreate.map((s) => ({
+        schoolId,
+        externalId: s.externalId,
+        fullName: s.fullName,
+        gradeLevel: s.gradeLevel || null,
+        age: s.age ?? null,
+        sex: s.sex ?? null,
+        phone: s.phone || null,
+        parentPhone: s.parentPhone || null,
+        parentEmail: s.parentEmail || null,
+        notes: s.notes || null,
+      })),
+    });
+  }
+
+  recordAudit({
+    actorUserId: user.id,
+    actorClerkUserId: user.clerkUserId,
+    schoolId,
+    action: 'student.bulkImport',
+    targetType: 'student',
+    metadata: {
+      requested: parsed.students.length,
+      created: toCreate.length,
+      skipped: skipped.length,
+    },
+  });
+
+  const locale = await getLocale();
+  revalidatePath(`/${locale}/students`);
+
+  return { created: toCreate.length, skipped };
+}
+
 const deleteStudentSchema = z.object({ studentId: z.string().min(1) });
 
 export async function deleteStudent(formData: FormData) {
