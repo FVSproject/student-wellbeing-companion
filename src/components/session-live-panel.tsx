@@ -107,6 +107,16 @@ export function SessionLivePanel({
 
   const deviceRef = useRef<BluetoothDevice | null>(null);
   const simulateTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Timestamp (client-side) of the most recent BLE sample received. Displayed
+  // as a "last: Ns ago" indicator so the counselor (and support) can tell at
+  // a glance whether the wristband is actually delivering data.
+  const [lastSampleAt, setLastSampleAt] = useState<number | null>(null);
+  const [nowMs, setNowMs] = useState(Date.now());
+  useEffect(() => {
+    const t = setInterval(() => setNowMs(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const secSinceLast = lastSampleAt ? Math.floor((nowMs - lastSampleAt) / 1000) : null;
 
   const locale = useLocale();
   const analysisLocale: 'en' | 'ar' = locale === 'ar' ? 'ar' : 'en';
@@ -306,6 +316,7 @@ export function SessionLivePanel({
       // 1. Update UI immediately — this is what makes the vitals feel real-time.
       setSamplesSent((n) => n + 1);
       setHistory((h) => [...h.slice(-(HISTORY_CAP - 1)), withVoice]);
+      setLastSampleAt(Date.now());
 
       // 2. Fire-and-forget the ingest write. `keepalive: true` so the request
       // survives if the counselor navigates away.
@@ -427,8 +438,24 @@ export function SessionLivePanel({
               {connState === 'error' && 'Error'}
             </span>
           </div>
-          <div className="text-xs text-muted-foreground">
-            {labels.samplesSent}: <span className="font-mono">{samplesSent}</span>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span>
+              {labels.samplesSent}: <span className="font-mono">{samplesSent}</span>
+            </span>
+            {secSinceLast != null && (
+              <span
+                className={
+                  secSinceLast <= 2
+                    ? 'flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700 ring-1 ring-emerald-200'
+                    : secSinceLast <= 5
+                      ? 'flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-amber-700 ring-1 ring-amber-200'
+                      : 'flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-rose-700 ring-1 ring-rose-200'
+                }
+              >
+                <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                last: {secSinceLast}s
+              </span>
+            )}
           </div>
         </div>
 

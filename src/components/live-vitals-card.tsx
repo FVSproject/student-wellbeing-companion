@@ -137,7 +137,7 @@ function SparkChart({
   // Rules-of-Hooks violation. Compute the gradient id unconditionally first.
   const gradientId = useUniqueId('spark-grad');
 
-  if (values.length < 2) {
+  if (values.length === 0) {
     return (
       <div
         className="flex items-center justify-center text-[11px] italic text-muted-foreground"
@@ -145,6 +145,34 @@ function SparkChart({
       >
         {waitingLabel}
       </div>
+    );
+  }
+
+  // Single-sample fallback: show a horizontal line at the current value so
+  // the counselor sees SOMETHING immediately after the first BLE bundle
+  // arrives, rather than a "waiting" placeholder that they'd read as broken.
+  if (values.length === 1) {
+    const y = height - ((clamp(values[0], min, max) - min) / (max - min || 1)) * height;
+    return (
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="none"
+        className={`h-auto w-full ${colorClass}`}
+        style={{ height }}
+      >
+        <line
+          x1={0}
+          y1={y}
+          x2={width}
+          y2={y}
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeDasharray="4 4"
+          strokeOpacity="0.6"
+        />
+        <circle cx={width - 4} cy={y} r="3.5" fill="currentColor" />
+        <circle cx={width - 4} cy={y} r="1.5" fill="white" />
+      </svg>
     );
   }
 
