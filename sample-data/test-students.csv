@@ -1,0 +1,13 @@
+﻿externalId,fullName,gradeLevel,age,sex,phone,parentPhone,parentEmail,notes
+STU-101,عائشة الأحمدي,الصف السابع,13,FEMALE,0501234501,0501112201,parent.ahmadi@example.com,طالبة نشطة اجتماعيًا
+STU-102,نورة الحربي,الصف السادس,12,أنثى,0501234502,0501112202,parent.harbi@example.com,
+STU-103,Layla Al-Ghamdi,Grade 8,14,Female,0501234503,0501112203,parent.ghamdi@example.com,Bilingual English/Arabic
+STU-104,فاطمة العتيبي,الصف الخامس,11,أنثى,,0501112204,,ملاحظات اختيارية
+STU-105,Maryam Al-Otaibi,Grade 7,13,FEMALE,0501234505,0501112205,parent.otaibi@example.com,
+STU-106,هند القحطاني,الصف الرابع,10,أنثى,,0501112206,,
+STU-107,ريم الدوسري,الصف التاسع,15,أنثى,0501234507,0501112207,parent.dossari@example.com,مهتمة بالفن
+STU-108,Sara Al-Zahrani,Grade 6,12,Female,0501234508,0501112208,parent.zahrani@example.com,
+STU-109,منى الشمري,الصف السابع,13,أنثى,,0501112209,,
+STU-110,Amal Al-Shehri,Grade 5,11,FEMALE,0501234510,0501112210,parent.shehri@example.com,Loves reading
+,طالبة بدون رقم مسبق,الصف السادس,12,أنثى,,0501112211,,ستحصل تلقائيًا على رقم AUTO-
+STU-112,دانة الرشيد,الصف الثامن,14,أنثى,0501234512,0501112212,parent.rashid@example.com,

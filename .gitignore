@@ -56,3 +56,9 @@ prisma/*.db-journal
 # personal / project-external files (not app code)
 TransactionReceipt*.pdf
 *_Cost_Analysis.xlsx
+
+# Root-level design scratch (canonical firmware lives under firmware/)
+/wearable_ino/
+/Untitled*.fzz
+/Untitled*.png
+*.pdf

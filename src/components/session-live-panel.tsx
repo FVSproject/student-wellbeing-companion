@@ -7,7 +7,7 @@ import { endSession } from '@/app/[locale]/(app)/sessions/actions';
 import { BLE, decodeSampleBundle } from '@/lib/ble';
 import type { Sample } from '@/lib/ingest-schema';
 import { gsrToNervousness } from '@/lib/utils';
-import { Sparkline } from './sparkline';
+import { LiveVitalsCard } from './live-vitals-card';
 import { SubmitButton } from './submit-button';
 import { AnalysisEntry } from './analysis-entry';
 
@@ -110,8 +110,6 @@ export function SessionLivePanel({
 
   const locale = useLocale();
   const analysisLocale: 'en' | 'ar' = locale === 'ar' ? 'ar' : 'en';
-
-  const lastSample = history[history.length - 1] ?? null;
 
   // --- Live audio: mic level meter + background Whisper transcription ---
   const [micState, setMicState] = useState<MicState>('off');
@@ -385,7 +383,7 @@ export function SessionLivePanel({
         setError(err instanceof Error ? err.message : String(err));
         stopSimulate();
       });
-    }, 3000);
+    }, 1000);
   }, [postSample, stopSimulate]);
 
   useEffect(() => {
@@ -396,17 +394,13 @@ export function SessionLivePanel({
   }, []);
 
   const isLive = connState === 'connected' || connState === 'simulating';
-  const hrSeries = useMemo(
-    () => history.map((s) => s.heartRate).filter((v): v is number => v != null),
+  const hrSeries = useMemo(() => history.map((s) => s.heartRate ?? null), [history]);
+  const spo2Series = useMemo(() => history.map((s) => s.spo2 ?? null), [history]);
+  const nervSeries = useMemo(
+    () => history.map((s) => gsrToNervousness(s.gsr)),
     [history]
   );
-  const nervousnessSeries = useMemo(
-    () =>
-      history
-        .map((s) => gsrToNervousness(s.gsr))
-        .filter((v): v is number => v != null),
-    [history]
-  );
+  const tempSeries = useMemo(() => history.map((s) => s.skinTemp ?? null), [history]);
 
   return (
     <div className="space-y-6">
@@ -433,36 +427,43 @@ export function SessionLivePanel({
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <Metric label={labels.hr} value={lastSample?.heartRate} unit="bpm" />
-          <Metric label={labels.spo2} value={lastSample?.spo2} unit="%" />
-          <Metric
-            label={labels.gsr}
-            value={gsrToNervousness(lastSample?.gsr)}
-            unit="%"
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <LiveVitalsCard
+            label={labels.hr}
+            values={hrSeries}
+            min={40}
+            max={140}
+            unit="bpm"
+            colorClass="text-rose-500"
+            normalRange={[60, 100]}
           />
-          <Metric label={labels.skinTemp} value={lastSample?.skinTemp} unit="°C" decimals={1} />
-        </div>
-
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <div className="rounded-md border border-border bg-muted/20 p-3 text-rose-600">
-            <Sparkline
-              values={hrSeries}
-              min={40}
-              max={140}
-              label={labels.hr}
-              color="currentColor"
-            />
-          </div>
-          <div className="rounded-md border border-border bg-muted/20 p-3 text-sky-600">
-            <Sparkline
-              values={nervousnessSeries}
-              min={0}
-              max={100}
-              label={labels.gsr}
-              color="currentColor"
-            />
-          </div>
+          <LiveVitalsCard
+            label={labels.spo2}
+            values={spo2Series}
+            min={85}
+            max={100}
+            unit="%"
+            colorClass="text-emerald-500"
+            normalRange={[95, 100]}
+          />
+          <LiveVitalsCard
+            label={labels.gsr}
+            values={nervSeries}
+            min={0}
+            max={100}
+            unit="%"
+            colorClass="text-sky-500"
+          />
+          <LiveVitalsCard
+            label={labels.skinTemp}
+            values={tempSeries}
+            min={32}
+            max={37}
+            unit="°C"
+            decimals={1}
+            colorClass="text-amber-500"
+            normalRange={[33, 35.5]}
+          />
         </div>
 
         <div className="mt-6 flex flex-wrap gap-2">
@@ -519,34 +520,6 @@ export function SessionLivePanel({
           {labels.endSession}
         </SubmitButton>
       </form>
-    </div>
-  );
-}
-
-function Metric({
-  label,
-  value,
-  unit,
-  decimals,
-}: {
-  label: string;
-  value: number | null | undefined;
-  unit?: string;
-  decimals?: number;
-}) {
-  const display =
-    value == null || Number.isNaN(value)
-      ? '—'
-      : decimals != null
-        ? value.toFixed(decimals)
-        : String(value);
-  return (
-    <div className="rounded-md border border-border bg-muted/30 p-3">
-      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</div>
-      <div className="mt-1 font-mono text-lg">
-        {display}
-        {value != null && unit && <span className="ml-1 text-xs text-muted-foreground">{unit}</span>}
-      </div>
     </div>
   );
 }

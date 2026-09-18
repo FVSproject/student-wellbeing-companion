@@ -529,8 +529,10 @@ void loop() {
 
   uint32_t now = millis();
 
-  // 2) Emit a sample bundle every 5 seconds.
-  if (now - lastBundleMs >= 5000) {
+  // 2) Emit a sample bundle every 1 second so HR / SpO2 update in near
+  // real time on the counselor's screen. MAX30102 processes samples at
+  // 25 Hz internally, so the beat detector always has fresh values.
+  if (now - lastBundleMs >= 1000) {
     lastBundleMs = now;
 
     SampleBundle bundle;
