@@ -133,6 +133,10 @@ function SparkChart({
 }) {
   const width = 260;
 
+  // Every hook MUST run on every render — early-return-with-hooks-after is a
+  // Rules-of-Hooks violation. Compute the gradient id unconditionally first.
+  const gradientId = useUniqueId('spark-grad');
+
   if (values.length < 2) {
     return (
       <div
@@ -155,8 +159,6 @@ function SparkChart({
   const areaPath = `${linePath} L ${(width).toFixed(1)},${height} L 0,${height} Z`;
 
   const last = points[points.length - 1];
-  // A stable gradient id per instance so multiple charts on the page don't collide.
-  const gradientId = useUniqueId('spark-grad');
 
   const normalBand =
     normalRange && normalRange.length === 2
