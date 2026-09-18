@@ -85,11 +85,15 @@ struct SampleBundle {
   uint8_t  spo2;          // 10    — %; 0xFF = invalid
   float    gsr;           // 11..14 — µS; NaN = invalid
   float    skinTemp;      // 15..18 — °C; NaN = invalid
-  uint8_t  motionScore;   // 19    — 0 (no MPU6050 in this build)
-  uint8_t  batteryPct;    // 20    — 0..100
+  uint8_t  batteryPct;    // 19    — 0..100
 };
 #pragma pack(pop)
-static_assert(sizeof(SampleBundle) == 21, "SampleBundle must be 21 bytes packed");
+// 20 bytes total — sized to fit in the default BLE ATT MTU of 23 which gives
+// 20 bytes of notification payload. The earlier 21-byte layout (with a
+// motionScore byte) was one byte over, causing every notify after the first
+// to be silently truncated by the ESP32-S3 BLE stack and dropped by the
+// browser decoder as a RangeError on offset 20.
+static_assert(sizeof(SampleBundle) == 20, "SampleBundle must be 20 bytes packed");
 
 // Explicit forward declarations for functions that take SampleBundle&.
 // The Arduino IDE preprocessor auto-generates prototypes at the top of the
@@ -417,7 +421,6 @@ void fillSampleBundle(SampleBundle& b) {
     b.skinTemp = NAN;
   }
 
-  b.motionScore = 0;
   b.batteryPct  = readBatteryPct();
 }
 

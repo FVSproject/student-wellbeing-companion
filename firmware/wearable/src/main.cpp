@@ -65,11 +65,12 @@ struct SampleBundle {
   uint8_t  spo2;          // 10    — percent; 0xFF = invalid
   float    gsr;           // 11..14 — microsiemens; NaN = invalid
   float    skinTemp;      // 15..18 — celsius; NaN = invalid
-  uint8_t  motionScore;   // 19    — 0..255 → 0..1 (no MPU6050 in this build → 0)
-  uint8_t  batteryPct;    // 20    — 0..100
+  uint8_t  batteryPct;    // 19    — 0..100
 };
 #pragma pack(pop)
-static_assert(sizeof(SampleBundle) == 21, "SampleBundle must be 21 bytes packed");
+// 20 bytes total — sized to fit in the default BLE ATT MTU of 23 which gives
+// 20 bytes of notification payload. See src/lib/ble.ts for the same reason.
+static_assert(sizeof(SampleBundle) == 20, "SampleBundle must be 20 bytes packed");
 
 // ---------- sensor objects ----------
 MAX30105              hrSensor;
@@ -382,8 +383,6 @@ static void fillSampleBundle(SampleBundle& b) {
   } else {
     b.skinTemp = NAN;
   }
-
-  b.motionScore = 0; // No MPU6050 in this build.
 
   b.batteryPct = readBatteryPct();
 }
