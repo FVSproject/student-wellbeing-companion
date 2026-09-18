@@ -290,26 +290,37 @@ export function SessionLivePanel({
   }, [sessionId, initialAnalysis?.id]);
 
   // --- POST samples to /api/ingest ---
+  // The UI updates SYNCHRONOUSLY the moment a sample arrives from BLE. The
+  // network write to /api/ingest happens in the background — its latency
+  // (especially on a cold Neon compute) must never block the chart from
+  // updating. If a request fails, we log but keep the sample in the local
+  // history so the counselor still sees the live vitals.
   const postSample = useCallback(
-    async (sample: Sample) => {
-      // Piggyback the current voice level so it lands on the SessionSample
-      // row alongside biometrics — the analyzer then bundles it naturally.
+    (sample: Sample): Promise<void> => {
       const withVoice: Sample = {
         ...sample,
         voiceLevel:
           micState === 'on' ? Math.min(1, voiceLevelRef.current) : sample.voiceLevel ?? null,
       };
-      const res = await fetch('/api/ingest', {
+
+      // 1. Update UI immediately — this is what makes the vitals feel real-time.
+      setSamplesSent((n) => n + 1);
+      setHistory((h) => [...h.slice(-(HISTORY_CAP - 1)), withVoice]);
+
+      // 2. Fire-and-forget the ingest write. `keepalive: true` so the request
+      // survives if the counselor navigates away.
+      void fetch('/api/ingest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, locale: analysisLocale, samples: [withVoice] }),
+        keepalive: true,
+      }).catch((err) => {
+        // Non-blocking: an ingest failure doesn't hide the current reading
+        // from the counselor. Log to console so it's visible in DevTools.
+        console.warn('[ingest] sample write failed', err);
       });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error ?? `Ingest failed (${res.status})`);
-      }
-      setSamplesSent((n) => n + 1);
-      setHistory((h) => [...h.slice(-(HISTORY_CAP - 1)), withVoice]);
+
+      return Promise.resolve();
     },
     [sessionId, analysisLocale, micState]
   );
